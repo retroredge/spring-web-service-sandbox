@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: spring-web-service-sandbox
+  datasource:
+    url: jdbc:mysql://localhost:3306/sandbox
+    username: sandbox
+    password: sandbox
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,info,env,loggers,mappings,scheduledtasks,httpexchanges,beans,prometheus
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: Spring Boot Sandbox
+    description: Sandbox for experimenting with Spring Boot features

@@ -1,0 +1,11 @@
+title,author,isbn,genre
+The Pragmatic Programmer,David Thomas & Andrew Hunt,978-0135957059,Software Engineering
+Clean Code,Robert C. Martin,978-0132350884,Software Engineering
+Designing Data-Intensive Applications,Martin Kleppmann,978-1449373320,Distributed Systems
+The Phoenix Project,Gene Kim & Kevin Behr,978-1942788294,DevOps
+Accelerate,Nicole Forsgren & Jez Humble,978-1942788331,DevOps
+Domain-Driven Design,Eric Evans,978-0321125217,Software Architecture
+Refactoring,Martin Fowler,978-0134757599,Software Engineering
+Release It!,Michael T. Nygard,978-1680502398,Software Engineering
+Site Reliability Engineering,Betsy Beyer & Chris Jones,978-1491929124,Operations
+The Art of Scalability,Martin L. Abbott & Michael T. Fisher,978-0134032801,Software Architecture

@@ -1,0 +1,14 @@
+# Build
+target/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Claude
+CLAUDE.md
+.claude/
+
+# OS
+.DS_Store

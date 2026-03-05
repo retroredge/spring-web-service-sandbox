@@ -1,0 +1,8 @@
+management:
+  endpoint:
+    env:
+      show-values: always
+
+logging:
+  level:
+    uk.co.redsoft.sandbox: DEBUG

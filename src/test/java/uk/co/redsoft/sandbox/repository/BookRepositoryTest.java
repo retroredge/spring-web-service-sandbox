@@ -1,0 +1,51 @@
+package uk.co.redsoft.sandbox.repository;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import uk.co.redsoft.sandbox.repository.BookEntity;
+
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+@DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Testcontainers
+class BookRepositoryTest {
+
+    @Container
+    @ServiceConnection
+    static MySQLContainer<?> mysql = new MySQLContainer<>("mysql:8.4");
+
+    @Autowired
+    private BookRepository bookRepository;
+
+    @Test
+    void savesAndFindsBookById() {
+        BookEntity saved = bookRepository.save(
+                new BookEntity("The Pragmatic Programmer", "David Thomas & Andrew Hunt", "978-0135957059", "Software Engineering")
+        );
+
+        Optional<BookEntity> found = bookRepository.findById(saved.getId());
+
+        assertThat(found).isPresent();
+        assertThat(found.get().getTitle()).isEqualTo("The Pragmatic Programmer");
+    }
+
+    @Test
+    void findAllReturnsAllSavedBooks() {
+        bookRepository.save(new BookEntity("Clean Code", "Robert C. Martin", "978-0132350884", "Software Engineering"));
+        bookRepository.save(new BookEntity("Designing Data-Intensive Applications", "Martin Kleppmann", "978-1449373320", "Software Engineering"));
+
+        List<BookEntity> books = bookRepository.findAll();
+
+        assertThat(books).hasSize(2);
+    }
+}
