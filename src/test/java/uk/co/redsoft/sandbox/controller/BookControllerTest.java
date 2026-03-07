@@ -34,7 +34,7 @@ class BookControllerTest {
     @MockitoBean
     private BookService bookService;
 
-@Test
+    @Test
     void getAllBooksReturns200WithAllBooks() throws Exception {
         when(bookService.findAll()).thenReturn(List.of(
                 new Book(1L, "The Pragmatic Programmer", "David Thomas & Andrew Hunt", "978-0135957059", "Software Engineering"),

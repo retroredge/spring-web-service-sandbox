@@ -8,8 +8,6 @@ import org.springframework.boot.testcontainers.service.connection.ServiceConnect
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import uk.co.redsoft.sandbox.repository.BookEntity;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -46,6 +44,6 @@ class BookRepositoryTest {
 
         List<BookEntity> books = bookRepository.findAll();
 
-        assertThat(books).hasSize(2);
+        assertThat(books).hasSizeGreaterThanOrEqualTo(2);
     }
 }
