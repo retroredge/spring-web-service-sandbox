@@ -1,6 +1,10 @@
 spring:
   application:
     name: spring-web-service-sandbox
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
   datasource:
     url: jdbc:mysql://localhost:3306/sandbox
     username: sandbox

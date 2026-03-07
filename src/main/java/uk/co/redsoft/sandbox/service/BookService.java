@@ -47,9 +47,7 @@ public class BookService {
                      .setSkipHeaderRecord(true)
                      .get()
                      .parse(reader)) {
-            var records = parser.getRecords();
-            log.debug("Queuing {} book(s) from CSV import", records.size());
-            for (var record : records) {
+            for (var record : parser) {
                 var message = new BookImportMessage(record.get("title"), record.get("author"), record.get("isbn"), record.get("genre"));
                 amqpTemplate.convertAndSend(RabbitConfig.QUEUE, message);
             }
