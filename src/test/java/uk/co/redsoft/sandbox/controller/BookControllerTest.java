@@ -9,10 +9,14 @@ import uk.co.redsoft.sandbox.model.Book;
 import uk.co.redsoft.sandbox.service.BookService;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.mock.web.MockMultipartFile;
+
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -68,10 +72,20 @@ class BookControllerTest {
     @Test
     void importBooksReturns202() throws Exception {
         var csv = "title,author,isbn,genre\nClean Code,Robert C. Martin,978-0132350884,Software Engineering\n";
-        var file = new org.springframework.mock.web.MockMultipartFile("file", "books-10.csv", "text/csv", csv.getBytes());
+        var file = new MockMultipartFile("file", "books-10.csv", "text/csv", csv.getBytes());
 
         mockMvc.perform(multipart("/books/import").file(file))
                 .andExpect(status().isAccepted());
+    }
+
+    @Test
+    void importBooksReturns400WhenFileCannotBeRead() throws Exception {
+        var file = new MockMultipartFile("file", "bad.csv", "text/csv", new byte[0]);
+        doThrow(new IOException("stream closed")).when(bookService).importCsv(any());
+
+        mockMvc.perform(multipart("/books/import").file(file))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Could not read uploaded file"));
     }
 
     @Test

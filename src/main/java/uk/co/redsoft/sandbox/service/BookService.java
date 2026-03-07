@@ -44,7 +44,7 @@ public class BookService {
              var parser = CSVFormat.DEFAULT.builder()
                      .setHeader()
                      .setSkipHeaderRecord(true)
-                     .build()
+                     .get()
                      .parse(reader)) {
             var records = parser.getRecords();
             log.debug("Queuing {} book(s) from CSV import", records.size());
