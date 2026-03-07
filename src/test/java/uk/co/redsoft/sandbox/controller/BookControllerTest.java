@@ -79,6 +79,28 @@ class BookControllerTest {
     }
 
     @Test
+    void createBookReturns400WhenTitleIsBlank() throws Exception {
+        mockMvc.perform(post("/books")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"title":"","author":"Author","isbn":"978-0132350884","genre":"Tech"}
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").exists());
+    }
+
+    @Test
+    void createBookReturns400WhenIsbnIsInvalid() throws Exception {
+        mockMvc.perform(post("/books")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"title":"Clean Code","author":"Author","isbn":"not-an-isbn","genre":"Tech"}
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.isbn").exists());
+    }
+
+    @Test
     void importBooksReturns400WhenFileCannotBeRead() throws Exception {
         var file = new MockMultipartFile("file", "bad.csv", "text/csv", new byte[0]);
         doThrow(new IOException("stream closed")).when(bookService).importCsv(any());

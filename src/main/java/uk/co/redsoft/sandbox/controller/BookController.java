@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -39,8 +40,8 @@ public class BookController {
     }
 
     @PostMapping
-    public ResponseEntity<Book> createBook(@RequestBody Book newBook) {
-        var book = bookService.create(newBook);
+    public ResponseEntity<Book> createBook(@Valid @RequestBody CreateBookRequest request) {
+        var book = bookService.create(new Book(null, request.title(), request.author(), request.isbn(), request.genre()));
         return ResponseEntity.created(URI.create("/books/" + book.id())).body(book);
     }
 
