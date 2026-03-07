@@ -9,6 +9,7 @@ import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.mock.web.MockMultipartFile;
 import uk.co.redsoft.sandbox.config.RabbitConfig;
 import uk.co.redsoft.sandbox.model.Book;
+import uk.co.redsoft.sandbox.model.BookImportMessage;
 import uk.co.redsoft.sandbox.repository.BookEntity;
 import uk.co.redsoft.sandbox.repository.BookRepository;
 
@@ -85,7 +86,7 @@ class BookServiceTest {
 
         bookService.importCsv(file);
 
-        verify(amqpTemplate, times(2)).convertAndSend(eq(RabbitConfig.QUEUE), any(BookEntity.class));
+        verify(amqpTemplate, times(2)).convertAndSend(eq(RabbitConfig.QUEUE), any(BookImportMessage.class));
     }
 
     private BookEntity entity(Long id, String title) {

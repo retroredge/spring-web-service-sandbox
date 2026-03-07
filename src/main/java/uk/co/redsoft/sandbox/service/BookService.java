@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import uk.co.redsoft.sandbox.config.RabbitConfig;
 import uk.co.redsoft.sandbox.model.Book;
+import uk.co.redsoft.sandbox.model.BookImportMessage;
 import uk.co.redsoft.sandbox.repository.BookEntity;
 import uk.co.redsoft.sandbox.repository.BookRepository;
 
@@ -49,8 +50,8 @@ public class BookService {
             var records = parser.getRecords();
             log.debug("Queuing {} book(s) from CSV import", records.size());
             for (var record : records) {
-                var entity = new BookEntity(record.get("title"), record.get("author"), record.get("isbn"), record.get("genre"));
-                amqpTemplate.convertAndSend(RabbitConfig.QUEUE, entity);
+                var message = new BookImportMessage(record.get("title"), record.get("author"), record.get("isbn"), record.get("genre"));
+                amqpTemplate.convertAndSend(RabbitConfig.QUEUE, message);
             }
         }
     }

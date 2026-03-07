@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
 import uk.co.redsoft.sandbox.config.RabbitConfig;
+import uk.co.redsoft.sandbox.model.BookImportMessage;
 import uk.co.redsoft.sandbox.repository.BookEntity;
 import uk.co.redsoft.sandbox.repository.BookRepository;
 
@@ -18,8 +19,8 @@ public class BookImportListener {
 
     @Timed("books.import.listener")
     @RabbitListener(queues = RabbitConfig.QUEUE)
-    public void onMessage(BookEntity entity) {
-        log.debug("Received message for book: '{}'", entity.getTitle());
-        bookRepository.save(entity);
+    public void onMessage(BookImportMessage message) {
+        log.debug("Received message for book: '{}'", message.title());
+        bookRepository.save(new BookEntity(message.title(), message.author(), message.isbn(), message.genre()));
     }
 }
