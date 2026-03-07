@@ -1,5 +1,6 @@
 package uk.co.redsoft.sandbox.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
 import org.springframework.amqp.core.AmqpTemplate;
@@ -16,16 +17,12 @@ import java.util.List;
 import java.util.Optional;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class BookService {
 
     private final BookRepository bookRepository;
     private final AmqpTemplate amqpTemplate;
-
-    public BookService(BookRepository bookRepository, AmqpTemplate amqpTemplate) {
-        this.bookRepository = bookRepository;
-        this.amqpTemplate = amqpTemplate;
-    }
 
     public List<Book> findAll() {
         return bookRepository.findAll().stream()
