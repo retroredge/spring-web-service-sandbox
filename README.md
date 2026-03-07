@@ -152,7 +152,6 @@ curl -X POST http://localhost:8080/books/import -F "file=@src/test/resources/boo
 
 | URL | Description |
 |-----|-------------|
-| `http://localhost:8080/hello` | Sample hello endpoint |
 | `GET http://localhost:8080/books` | List all books |
 | `GET http://localhost:8080/books/{id}` | Get a book by ID |
 | `POST http://localhost:8080/books` | Add a new book |
