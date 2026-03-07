@@ -1,4 +1,4 @@
-package uk.co.redsoft.sandbox.controller;
+package uk.co.redsoft.sandbox.adapters.in.web;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;

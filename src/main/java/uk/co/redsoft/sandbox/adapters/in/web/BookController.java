@@ -1,20 +1,21 @@
-package uk.co.redsoft.sandbox.controller;
+package uk.co.redsoft.sandbox.adapters.in.web;
 
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import uk.co.redsoft.sandbox.model.Book;
-import uk.co.redsoft.sandbox.service.BookService;
+import uk.co.redsoft.sandbox.domain.model.Book;
+import uk.co.redsoft.sandbox.domain.ports.in.BookUseCase;
 
 import java.io.IOException;
 import java.net.URI;
@@ -25,29 +26,29 @@ import java.util.List;
 @RequestMapping("/books")
 public class BookController {
 
-    private final BookService bookService;
+    private final BookUseCase bookUseCase;
 
     @GetMapping
     public List<Book> getAllBooks() {
-        return bookService.findAll();
+        return bookUseCase.findAll();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Book> getBook(@PathVariable Long id) {
-        return bookService.findById(id)
+        return bookUseCase.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
     public ResponseEntity<Book> createBook(@Valid @RequestBody CreateBookRequest request) {
-        var book = bookService.create(new Book(null, request.title(), request.author(), request.isbn(), request.genre()));
+        var book = bookUseCase.create(new Book(null, request.title(), request.author(), request.isbn(), request.genre()));
         return ResponseEntity.created(URI.create("/books/" + book.id())).body(book);
     }
 
-    @PostMapping("/import")
+    @PostMapping(value = "/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void importBooks(@RequestParam MultipartFile file) throws IOException {
-        bookService.importCsv(file);
+        bookUseCase.importBooks(file.getInputStream());
     }
 }

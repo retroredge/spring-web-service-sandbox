@@ -1,19 +1,19 @@
-package uk.co.redsoft.sandbox.controller;
+package uk.co.redsoft.sandbox.adapters.in.web;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import uk.co.redsoft.sandbox.model.Book;
-import uk.co.redsoft.sandbox.service.BookService;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+import uk.co.redsoft.sandbox.domain.model.Book;
+import uk.co.redsoft.sandbox.domain.ports.in.BookUseCase;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
-
-import org.springframework.mock.web.MockMultipartFile;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
@@ -32,11 +32,11 @@ class BookControllerTest {
     private MockMvc mockMvc;
 
     @MockitoBean
-    private BookService bookService;
+    private BookUseCase bookUseCase;
 
     @Test
     void getAllBooksReturns200WithAllBooks() throws Exception {
-        when(bookService.findAll()).thenReturn(List.of(
+        when(bookUseCase.findAll()).thenReturn(List.of(
                 new Book(1L, "The Pragmatic Programmer", "David Thomas & Andrew Hunt", "978-0135957059", "Software Engineering"),
                 new Book(2L, "Clean Code", "Robert C. Martin", "978-0132350884", "Software Engineering")
         ));
@@ -50,7 +50,7 @@ class BookControllerTest {
 
     @Test
     void getBookReturns200WithBookWhenFound() throws Exception {
-        when(bookService.findById(1L)).thenReturn(Optional.of(
+        when(bookUseCase.findById(1L)).thenReturn(Optional.of(
                 new Book(1L, "The Pragmatic Programmer", "David Thomas & Andrew Hunt", "978-0135957059", "Software Engineering")
         ));
 
@@ -63,19 +63,10 @@ class BookControllerTest {
 
     @Test
     void getBookReturns404WhenNotFound() throws Exception {
-        when(bookService.findById(99L)).thenReturn(Optional.empty());
+        when(bookUseCase.findById(99L)).thenReturn(Optional.empty());
 
         mockMvc.perform(get("/books/99"))
                 .andExpect(status().isNotFound());
-    }
-
-    @Test
-    void importBooksReturns202() throws Exception {
-        var csv = "title,author,isbn,genre\nClean Code,Robert C. Martin,978-0132350884,Software Engineering\n";
-        var file = new MockMultipartFile("file", "books-10.csv", "text/csv", csv.getBytes());
-
-        mockMvc.perform(multipart("/books/import").file(file))
-                .andExpect(status().isAccepted());
     }
 
     @Test
@@ -101,9 +92,18 @@ class BookControllerTest {
     }
 
     @Test
+    void importBooksReturns202() throws Exception {
+        var csv = "title,author,isbn,genre\nClean Code,Robert C. Martin,978-0132350884,Software Engineering\n";
+        var file = new MockMultipartFile("file", "books-10.csv", "text/csv", csv.getBytes());
+
+        mockMvc.perform(multipart("/books/import").file(file))
+                .andExpect(status().isAccepted());
+    }
+
+    @Test
     void importBooksReturns400WhenFileCannotBeRead() throws Exception {
         var file = new MockMultipartFile("file", "bad.csv", "text/csv", new byte[0]);
-        doThrow(new IOException("stream closed")).when(bookService).importCsv(any());
+        doThrow(new IOException("stream closed")).when(bookUseCase).importBooks(any(InputStream.class));
 
         mockMvc.perform(multipart("/books/import").file(file))
                 .andExpect(status().isBadRequest())
@@ -112,7 +112,7 @@ class BookControllerTest {
 
     @Test
     void createBookReturns201WithLocationAndBody() throws Exception {
-        when(bookService.create(any(Book.class))).thenReturn(
+        when(bookUseCase.create(any(Book.class))).thenReturn(
                 new Book(1L, "Clean Code", "Robert C. Martin", "978-0132350884", "Software Engineering")
         );
 

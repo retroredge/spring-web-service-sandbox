@@ -1,4 +1,4 @@
-package uk.co.redsoft.sandbox.repository;
+package uk.co.redsoft.sandbox.adapters.out.persistence;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +8,7 @@ import org.springframework.boot.testcontainers.service.connection.ServiceConnect
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -23,15 +24,15 @@ class BookRepositoryTest {
     static MySQLContainer<?> mysql = new MySQLContainer<>("mysql:8.4");
 
     @Autowired
-    private BookRepository bookRepository;
+    private JpaBookRepository jpaBookRepository;
 
     @Test
     void savesAndFindsBookById() {
-        BookEntity saved = bookRepository.save(
+        BookEntity saved = jpaBookRepository.save(
                 new BookEntity("The Pragmatic Programmer", "David Thomas & Andrew Hunt", "978-0135957059", "Software Engineering")
         );
 
-        Optional<BookEntity> found = bookRepository.findById(saved.getId());
+        Optional<BookEntity> found = jpaBookRepository.findById(saved.getId());
 
         assertThat(found).isPresent();
         assertThat(found.get().getTitle()).isEqualTo("The Pragmatic Programmer");
@@ -39,10 +40,10 @@ class BookRepositoryTest {
 
     @Test
     void findAllReturnsAllSavedBooks() {
-        bookRepository.save(new BookEntity("Clean Code", "Robert C. Martin", "978-0132350884", "Software Engineering"));
-        bookRepository.save(new BookEntity("Designing Data-Intensive Applications", "Martin Kleppmann", "978-1449373320", "Software Engineering"));
+        jpaBookRepository.save(new BookEntity("Clean Code", "Robert C. Martin", "978-0132350884", "Software Engineering"));
+        jpaBookRepository.save(new BookEntity("Designing Data-Intensive Applications", "Martin Kleppmann", "978-1449373320", "Software Engineering"));
 
-        List<BookEntity> books = bookRepository.findAll();
+        List<BookEntity> books = jpaBookRepository.findAll();
 
         assertThat(books).hasSizeGreaterThanOrEqualTo(2);
     }

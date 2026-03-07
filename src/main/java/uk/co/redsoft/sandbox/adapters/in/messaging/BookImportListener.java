@@ -1,26 +1,25 @@
-package uk.co.redsoft.sandbox.service;
+package uk.co.redsoft.sandbox.adapters.in.messaging;
 
 import io.micrometer.core.annotation.Timed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import uk.co.redsoft.sandbox.config.RabbitConfig;
-import uk.co.redsoft.sandbox.model.BookImportMessage;
-import uk.co.redsoft.sandbox.repository.BookEntity;
-import uk.co.redsoft.sandbox.repository.BookRepository;
+import uk.co.redsoft.sandbox.domain.model.Book;
+import uk.co.redsoft.sandbox.domain.ports.in.BookUseCase;
 
 @Slf4j
 @RequiredArgsConstructor
-@Service
+@Component
 public class BookImportListener {
 
-    private final BookRepository bookRepository;
+    private final BookUseCase bookUseCase;
 
     @Timed("books.import.listener")
     @RabbitListener(queues = RabbitConfig.QUEUE)
     public void onMessage(BookImportMessage message) {
         log.debug("Received message for book: '{}'", message.title());
-        bookRepository.save(new BookEntity(message.title(), message.author(), message.isbn(), message.genre()));
+        bookUseCase.create(new Book(null, message.title(), message.author(), message.isbn(), message.genre()));
     }
 }

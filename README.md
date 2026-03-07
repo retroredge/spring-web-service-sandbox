@@ -15,6 +15,38 @@ Features:
 * Multi-layer testing: Mockito, Spring and Testcontainers (Dockerised dependencies in tests)
 * Prometheus metrics with Grafana dashboards
 
+## Architecture
+
+This project uses the **Ports and Adapters** (Hexagonal) architecture pattern. The codebase is organised into two top-level packages:
+
+### `domain`
+
+The core of the application — no framework or infrastructure dependencies.
+
+| Package | Contents |
+|---------|----------|
+| `domain.model` | Domain objects (e.g. `Book`) |
+| `domain.ports.in` | Incoming port interfaces — use cases the domain exposes to the outside world (e.g. `BookUseCase`) |
+| `domain.ports.out` | Outgoing port interfaces — abstractions the domain requires of infrastructure (e.g. `BookStore`, `BookImportPort`) |
+| `domain.usecase` | Implementations of the incoming ports (e.g. `BookService`) |
+
+### `adapters`
+
+Adapters connect the domain to the outside world. They implement or call the port interfaces.
+
+| Package | Contents |
+|---------|----------|
+| `adapters.in.web` | HTTP driving adapters — Spring MVC controllers and request DTOs |
+| `adapters.in.messaging` | AMQP driving adapters — RabbitMQ listeners and message types |
+| `adapters.out.persistence` | JPA driven adapters — Spring Data repositories and entities |
+| `adapters.out.messaging` | AMQP driven adapters — RabbitMQ publishers |
+
+### `config`
+
+Spring `@Configuration` classes that wire adapters to ports (dependency injection glue). These sit outside both `domain` and `adapters` as they are cross-cutting infrastructure.
+
+---
+
 ## Build and test
 
 ```bash
@@ -96,10 +128,11 @@ SELECT * FROM books;
 
 ## Bulk import
 
-The `POST /books/import` endpoint accepts a multipart CSV file with the following header row:
+The `POST /books/import` endpoint accepts a CSV file with a header row and data rows:
 
 ```
 title,author,isbn,genre
+Domain-Driven Design,Eric Evans,978-0321125217,Software Architecture
 Clean Code,Robert C. Martin,978-0132350884,Software Engineering
 ```
 

@@ -1,4 +1,4 @@
-package uk.co.redsoft.sandbox.service;
+package uk.co.redsoft.sandbox.adapters.in.messaging;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -6,9 +6,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.co.redsoft.sandbox.model.BookImportMessage;
-import uk.co.redsoft.sandbox.repository.BookEntity;
-import uk.co.redsoft.sandbox.repository.BookRepository;
+import uk.co.redsoft.sandbox.domain.model.Book;
+import uk.co.redsoft.sandbox.domain.ports.in.BookUseCase;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
@@ -17,20 +16,20 @@ import static org.mockito.Mockito.verify;
 class BookImportListenerTest {
 
     @Mock
-    private BookRepository bookRepository;
+    private BookUseCase bookUseCase;
 
     @InjectMocks
     private BookImportListener bookImportListener;
 
     @Test
-    void onMessageSavesEntity() {
+    void onMessageCreatesBook() {
         var message = new BookImportMessage("Clean Code", "Robert C. Martin", "978-0132350884", "Software Engineering");
 
         bookImportListener.onMessage(message);
 
-        var captor = ArgumentCaptor.forClass(BookEntity.class);
-        verify(bookRepository).save(captor.capture());
-        assertThat(captor.getValue().getTitle()).isEqualTo("Clean Code");
-        assertThat(captor.getValue().getIsbn()).isEqualTo("978-0132350884");
+        var captor = ArgumentCaptor.forClass(Book.class);
+        verify(bookUseCase).create(captor.capture());
+        assertThat(captor.getValue().title()).isEqualTo("Clean Code");
+        assertThat(captor.getValue().isbn()).isEqualTo("978-0132350884");
     }
 }

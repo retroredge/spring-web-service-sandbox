@@ -1,4 +1,4 @@
-package uk.co.redsoft.sandbox.repository;
+package uk.co.redsoft.sandbox.adapters.out.persistence;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -34,5 +34,4 @@ public class BookEntity {
         this(title, author, isbn, genre);
         this.id = id;
     }
-
 }
