@@ -18,6 +18,6 @@ public class RabbitConfig {
 
     @Bean
     MessageConverter messageConverter() {
-        return new JacksonJsonMessageConverter("uk.co.redsoft.sandbox.adapters.in.messaging");
+        return new JacksonJsonMessageConverter("uk.co.redsoft.sandbox.domain.model");
     }
 }

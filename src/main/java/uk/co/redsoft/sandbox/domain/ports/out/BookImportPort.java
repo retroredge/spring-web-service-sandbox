@@ -1,7 +1,7 @@
 package uk.co.redsoft.sandbox.domain.ports.out;
 
-import uk.co.redsoft.sandbox.domain.model.Book;
+import uk.co.redsoft.sandbox.domain.model.CreateBookCommand;
 
 public interface BookImportPort {
-    void enqueue(Book book);
+    void enqueue(CreateBookCommand command);
 }

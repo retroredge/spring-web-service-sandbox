@@ -8,15 +8,15 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.co.redsoft.sandbox.domain.model.Book;
+import uk.co.redsoft.sandbox.domain.model.CreateBookCommand;
 import uk.co.redsoft.sandbox.domain.ports.in.BookUseCase;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -101,18 +101,21 @@ class BookControllerTest {
     }
 
     @Test
-    void importBooksReturns400WhenFileCannotBeRead() throws Exception {
-        var file = new MockMultipartFile("file", "bad.csv", "text/csv", new byte[0]);
-        doThrow(new IOException("stream closed")).when(bookUseCase).importBooks(any(InputStream.class));
+    void importBooksSkipsInvalidRows() throws Exception {
+        var csv = "title,author,isbn,genre\n" +
+                  "Clean Code,Robert C. Martin,978-0132350884,Software Engineering\n" +
+                  "Bad Book,Author,not-an-isbn,Tech\n";
+        var file = new MockMultipartFile("file", "books.csv", "text/csv", csv.getBytes());
 
         mockMvc.perform(multipart("/books/import").file(file))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").value("Could not read uploaded file"));
+                .andExpect(status().isAccepted());
+
+        verify(bookUseCase, times(1)).importBook(any(CreateBookCommand.class));
     }
 
     @Test
     void createBookReturns201WithLocationAndBody() throws Exception {
-        when(bookUseCase.create(any(Book.class))).thenReturn(
+        when(bookUseCase.create(any(CreateBookCommand.class))).thenReturn(
                 new Book(1L, "Clean Code", "Robert C. Martin", "978-0132350884", "Software Engineering")
         );
 

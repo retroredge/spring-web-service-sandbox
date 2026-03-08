@@ -6,11 +6,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.redsoft.sandbox.domain.model.Book;
+import uk.co.redsoft.sandbox.domain.model.CreateBookCommand;
 import uk.co.redsoft.sandbox.domain.ports.out.BookImportPort;
 import uk.co.redsoft.sandbox.domain.ports.out.BookStore;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -63,25 +62,21 @@ class BookServiceTest {
 
     @Test
     void createSavesAndReturnsBook() {
-        when(bookStore.save(any(Book.class))).thenReturn(
+        when(bookStore.save(any(CreateBookCommand.class))).thenReturn(
                 new Book(1L, "Clean Code", "Author", "978-0000000000", "Software Engineering"));
 
-        var result = bookService.create(new Book(null, "Clean Code", "Author", "978-0000000000", "Software Engineering"));
+        var result = bookService.create(new CreateBookCommand("Clean Code", "Author", "978-0000000000", "Software Engineering"));
 
         assertThat(result.id()).isEqualTo(1L);
         assertThat(result.title()).isEqualTo("Clean Code");
     }
 
     @Test
-    void importBooksEnqueuesEachRow() throws IOException {
-        var csv = """
-                title,author,isbn,genre
-                Clean Code,Robert C. Martin,978-0132350884,Software Engineering
-                The Pragmatic Programmer,David Thomas,978-0135957059,Software Engineering
-                """;
+    void importBookEnqueuesBook() {
+        var command = new CreateBookCommand("Clean Code", "Robert C. Martin", "978-0132350884", "Software Engineering");
 
-        bookService.importBooks(new ByteArrayInputStream(csv.getBytes()));
+        bookService.importBook(command);
 
-        verify(bookImportPort, times(2)).enqueue(any(Book.class));
+        verify(bookImportPort).enqueue(command);
     }
 }

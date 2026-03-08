@@ -6,7 +6,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.co.redsoft.sandbox.domain.model.Book;
+import uk.co.redsoft.sandbox.domain.model.CreateBookCommand;
 import uk.co.redsoft.sandbox.domain.ports.in.BookUseCase;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,11 +23,11 @@ class BookImportListenerTest {
 
     @Test
     void onMessageCreatesBook() {
-        var message = new BookImportMessage("Clean Code", "Robert C. Martin", "978-0132350884", "Software Engineering");
+        var command = new CreateBookCommand("Clean Code", "Robert C. Martin", "978-0132350884", "Software Engineering");
 
-        bookImportListener.onMessage(message);
+        bookImportListener.onMessage(command);
 
-        var captor = ArgumentCaptor.forClass(Book.class);
+        var captor = ArgumentCaptor.forClass(CreateBookCommand.class);
         verify(bookUseCase).create(captor.capture());
         assertThat(captor.getValue().title()).isEqualTo("Clean Code");
         assertThat(captor.getValue().isbn()).isEqualTo("978-0132350884");
