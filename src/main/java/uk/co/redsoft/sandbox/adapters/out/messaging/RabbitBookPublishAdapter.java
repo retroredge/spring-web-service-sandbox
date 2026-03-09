@@ -15,6 +15,6 @@ public class RabbitBookPublishAdapter implements BookImportPort {
 
     @Override
     public void submitForImport(CreateBookCommand command) {
-        amqpTemplate.convertAndSend(RabbitConfig.QUEUE, command);
+        amqpTemplate.convertAndSend(RabbitConfig.EXCHANGE, RabbitConfig.ROUTING_KEY, command);
     }
 }
