@@ -10,4 +10,5 @@ public interface BookStore {
     List<Book> findAll();
     Optional<Book> findById(Long id);
     boolean existsByIsbn(String isbn);
+    void deleteById(Long id);
 }

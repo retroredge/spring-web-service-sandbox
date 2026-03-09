@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.redsoft.sandbox.domain.model.Book;
 import uk.co.redsoft.sandbox.domain.model.BookAlreadyExistsException;
+import uk.co.redsoft.sandbox.domain.model.BookNotFoundException;
 import uk.co.redsoft.sandbox.domain.model.CreateBookCommand;
 import uk.co.redsoft.sandbox.domain.ports.out.BookImportPort;
 import uk.co.redsoft.sandbox.domain.ports.out.BookStore;
@@ -88,5 +89,46 @@ class BookServiceTest {
         bookService.importBook(command);
 
         verify(bookImportPort).submitForImport(command);
+    }
+
+    @Test
+    void updateReturnsUpdatedBook() {
+        when(bookStore.findById(1L)).thenReturn(Optional.of(
+                new Book(1L, "Old Title", "Author", "978-0000000000", "Tech")
+        ));
+        when(bookStore.save(any(Book.class))).thenReturn(
+                new Book(1L, "New Title", "Author", "978-0000000000", "Tech")
+        );
+
+        var result = bookService.update(1L, new CreateBookCommand("New Title", "Author", "978-0000000000", "Tech"));
+
+        assertThat(result.title()).isEqualTo("New Title");
+    }
+
+    @Test
+    void updateThrowsWhenBookNotFound() {
+        when(bookStore.findById(99L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> bookService.update(99L, new CreateBookCommand("Title", "Author", "978-0000000000", "Tech")))
+                .isInstanceOf(BookNotFoundException.class);
+    }
+
+    @Test
+    void deleteRemovesBook() {
+        when(bookStore.findById(1L)).thenReturn(Optional.of(
+                new Book(1L, "Title", "Author", "978-0000000000", "Tech")
+        ));
+
+        bookService.delete(1L);
+
+        verify(bookStore).deleteById(1L);
+    }
+
+    @Test
+    void deleteThrowsWhenBookNotFound() {
+        when(bookStore.findById(99L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> bookService.delete(99L))
+                .isInstanceOf(BookNotFoundException.class);
     }
 }

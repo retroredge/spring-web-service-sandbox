@@ -34,11 +34,19 @@ public class BookRepositoryAdapter implements BookStore {
         return jpaBookRepository.existsByIsbn(isbn);
     }
 
+    @Override
+    public void deleteById(Long id) {
+        jpaBookRepository.deleteById(id);
+    }
+
     private Book toBook(BookEntity entity) {
         return new Book(entity.getId(), entity.getTitle(), entity.getAuthor(), entity.getIsbn(), entity.getGenre());
     }
 
     private BookEntity toEntity(Book book) {
+        if (book.id() != null) {
+            return new BookEntity(book.id(), book.title(), book.author(), book.isbn(), book.genre());
+        }
         return new BookEntity(book.title(), book.author(), book.isbn(), book.genre());
     }
 }
