@@ -3,7 +3,6 @@ package uk.co.redsoft.sandbox.adapters.out.persistence;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.co.redsoft.sandbox.domain.model.Book;
-import uk.co.redsoft.sandbox.domain.model.CreateBookCommand;
 import uk.co.redsoft.sandbox.domain.ports.out.BookStore;
 
 import java.util.List;
@@ -16,8 +15,8 @@ public class BookRepositoryAdapter implements BookStore {
     private final JpaBookRepository jpaBookRepository;
 
     @Override
-    public Book save(CreateBookCommand command) {
-        return toBook(jpaBookRepository.save(toEntity(command)));
+    public Book save(Book book) {
+        return toBook(jpaBookRepository.save(toEntity(book)));
     }
 
     @Override
@@ -34,7 +33,7 @@ public class BookRepositoryAdapter implements BookStore {
         return new Book(entity.getId(), entity.getTitle(), entity.getAuthor(), entity.getIsbn(), entity.getGenre());
     }
 
-    private BookEntity toEntity(CreateBookCommand command) {
-        return new BookEntity(command.title(), command.author(), command.isbn(), command.genre());
+    private BookEntity toEntity(Book book) {
+        return new BookEntity(book.title(), book.author(), book.isbn(), book.genre());
     }
 }

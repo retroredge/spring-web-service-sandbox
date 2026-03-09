@@ -1,8 +1,5 @@
 package uk.co.redsoft.sandbox.domain.usecase;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 import uk.co.redsoft.sandbox.domain.model.Book;
 import uk.co.redsoft.sandbox.domain.model.CreateBookCommand;
 import uk.co.redsoft.sandbox.domain.ports.in.BookUseCase;
@@ -12,13 +9,15 @@ import uk.co.redsoft.sandbox.domain.ports.out.BookStore;
 import java.util.List;
 import java.util.Optional;
 
-@Slf4j
-@RequiredArgsConstructor
-@Service
 public class BookService implements BookUseCase {
 
     private final BookStore bookStore;
     private final BookImportPort bookImportPort;
+
+    public BookService(BookStore bookStore, BookImportPort bookImportPort) {
+        this.bookStore = bookStore;
+        this.bookImportPort = bookImportPort;
+    }
 
     @Override
     public List<Book> findAll() {
@@ -32,11 +31,12 @@ public class BookService implements BookUseCase {
 
     @Override
     public Book create(CreateBookCommand command) {
-        return bookStore.save(command);
+        var book = new Book(null, command.title(), command.author(), command.isbn(), command.genre());
+        return bookStore.save(book);
     }
 
     @Override
     public void importBook(CreateBookCommand command) {
-        bookImportPort.enqueue(command);
+        bookImportPort.submitForImport(command);
     }
 }

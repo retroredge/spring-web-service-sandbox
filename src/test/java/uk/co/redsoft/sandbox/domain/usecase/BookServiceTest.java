@@ -15,7 +15,6 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -62,7 +61,7 @@ class BookServiceTest {
 
     @Test
     void createSavesAndReturnsBook() {
-        when(bookStore.save(any(CreateBookCommand.class))).thenReturn(
+        when(bookStore.save(any(Book.class))).thenReturn(
                 new Book(1L, "Clean Code", "Author", "978-0000000000", "Software Engineering"));
 
         var result = bookService.create(new CreateBookCommand("Clean Code", "Author", "978-0000000000", "Software Engineering"));
@@ -77,6 +76,6 @@ class BookServiceTest {
 
         bookService.importBook(command);
 
-        verify(bookImportPort).enqueue(command);
+        verify(bookImportPort).submitForImport(command);
     }
 }
