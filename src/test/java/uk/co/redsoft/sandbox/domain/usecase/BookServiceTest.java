@@ -62,7 +62,7 @@ class BookServiceTest {
 
     @Test
     void createSavesAndReturnsBook() {
-        when(bookStore.save(any(CreateBookCommand.class))).thenReturn(
+        when(bookStore.save(any(Book.class))).thenReturn(
                 new Book(1L, "Clean Code", "Author", "978-0000000000", "Software Engineering"));
 
         var result = bookService.create(new CreateBookCommand("Clean Code", "Author", "978-0000000000", "Software Engineering"));

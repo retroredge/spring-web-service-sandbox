@@ -32,7 +32,7 @@ public class BookService implements BookUseCase {
 
     @Override
     public Book create(CreateBookCommand command) {
-        return bookStore.save(command);
+        return bookStore.save(new Book(null, command.title(), command.author(), command.isbn(), command.genre()));
     }
 
     @Override

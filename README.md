@@ -174,4 +174,10 @@ curl -X POST http://localhost:8080/books/import -F "file=@src/test/resources/boo
 | `http://localhost:8080/actuator/beans` | All Spring beans in the application context |
 | `http://localhost:8080/actuator/prometheus` | Prometheus metrics scrape endpoint |
 
+## Sequence Diagram for the import books journey
 
+The key thing the diagram makes visible is the async boundary — the client gets its 202 Accepted as soon as all valid 
+rows are enqueued, before any of them have actually been persisted. The RabbitMQ → listener → DB flow happens entirely 
+independently afterwards.
+
+[Import books Mermaid Diagram](https://mermaid.live/edit#pako:eNqVVd1u2jAUfpUjX1EtUAh_xReVGOvFpnVry9qLiRuTHMBqYme2Q8uqSnuIPeGeZI5DgEBgXaRI9sn3fef4_DgvJJAhEko0_khRBPiBs7li8USAe1hgpIJRxFGYwpYwZXjAEyYMvJfycSSFUTKKUFUhHljEQ2ZVjtHvNY6YRmDabceoljzAY-iPcSKVubFvRrhj0yk3mf0mnUZcL4YhS0x1IDn2-va08meuDQo8Gu3YnmQT6x0mUnNrWZ3w-ylhZexEFLA8r_XLy3IaKdx8HX-D86m16nPu4oLaaPwAMx7h2ZYfSZnAzBYIWbCADKDkU_Exe8q6FY4EPsFIITOYx2ibQJuaVbGuMAr12Um1TW0pLPMl1lSuUSJucPWKEJZcRsxwKfT2YK71IrPzDYQ0gHFiVruYN50xkvPGE1MC3oF-5Ml-jjCyzefC_2_lcvZGMo6ZCIsMVGXwqOp6CCjk1c5MtSDXqxRY49fs7VBQQGG9p3iSvcVbgWIuKARSLFGZoQjHaM9xe391f-VBlZD9XGzdstjsnc2q5y1OwW_6MAwCtFOyg_8iDYK0TjfT6R2OIoWhXolgoaSQqYY_v37DgiUJ2qZgMzt0TptrUGhSJXbly_Ph8hJCjFqzOe4ep3BeSufWvRTXOad2UOyD-Shz96sbOH5lbQ6r6q4aCpotjzMcpow38koYblb_5BxcTGtf6Ogl2gG0XvaZLXOvbwrQtXeFmy1hP3HZ5li2jlRtl2KblHhkrnhIqFEpeiRGFbNsS14y0ISYBcY4IdQuQ6YeJ2QiXi3HXuHfpYwLmpLpfEHojNlLwyNpkl1561_mxqqsN1QjmQpDaLvfbzoVQl_IM6H1VrPbaQwuWheD3qDda_u-R1bW3Gv1G62e73da3U6n2-91Xz3y0zn2G81-u-V32gO_e9Fp9vsewTArwnX-53Y_8Ne_PKeKTA)
