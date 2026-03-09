@@ -29,6 +29,11 @@ public class BookRepositoryAdapter implements BookStore {
         return jpaBookRepository.findById(id).map(this::toBook);
     }
 
+    @Override
+    public boolean existsByIsbn(String isbn) {
+        return jpaBookRepository.existsByIsbn(isbn);
+    }
+
     private Book toBook(BookEntity entity) {
         return new Book(entity.getId(), entity.getTitle(), entity.getAuthor(), entity.getIsbn(), entity.getGenre());
     }

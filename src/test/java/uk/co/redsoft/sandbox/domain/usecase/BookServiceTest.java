@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.redsoft.sandbox.domain.model.Book;
+import uk.co.redsoft.sandbox.domain.model.BookAlreadyExistsException;
 import uk.co.redsoft.sandbox.domain.model.CreateBookCommand;
 import uk.co.redsoft.sandbox.domain.ports.out.BookImportPort;
 import uk.co.redsoft.sandbox.domain.ports.out.BookStore;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -68,6 +70,15 @@ class BookServiceTest {
 
         assertThat(result.id()).isEqualTo(1L);
         assertThat(result.title()).isEqualTo("Clean Code");
+    }
+
+    @Test
+    void createThrowsWhenIsbnAlreadyExists() {
+        when(bookStore.existsByIsbn("978-0000000000")).thenReturn(true);
+
+        assertThatThrownBy(() -> bookService.create(new CreateBookCommand("Duplicate", "Author", "978-0000000000", "Tech")))
+                .isInstanceOf(BookAlreadyExistsException.class)
+                .hasMessageContaining("978-0000000000");
     }
 
     @Test

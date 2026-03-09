@@ -1,6 +1,7 @@
 package uk.co.redsoft.sandbox.domain.usecase;
 
 import uk.co.redsoft.sandbox.domain.model.Book;
+import uk.co.redsoft.sandbox.domain.model.BookAlreadyExistsException;
 import uk.co.redsoft.sandbox.domain.model.CreateBookCommand;
 import uk.co.redsoft.sandbox.domain.ports.in.BookUseCase;
 import uk.co.redsoft.sandbox.domain.ports.out.BookImportPort;
@@ -31,6 +32,9 @@ public class BookService implements BookUseCase {
 
     @Override
     public Book create(CreateBookCommand command) {
+        if (bookStore.existsByIsbn(command.isbn())) {
+            throw new BookAlreadyExistsException(command.isbn());
+        }
         var book = new Book(null, command.title(), command.author(), command.isbn(), command.genre());
         return bookStore.save(book);
     }
