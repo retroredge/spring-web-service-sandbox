@@ -11,4 +11,6 @@ public interface BookUseCase {
     Optional<Book> findById(Long id);
     Book create(CreateBookCommand command);
     void importBook(CreateBookCommand command);
+    Book update(Long id, CreateBookCommand command);
+    void delete(Long id);
 }

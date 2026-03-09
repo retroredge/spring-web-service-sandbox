@@ -18,9 +18,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -92,12 +94,14 @@ class BookControllerTest {
     }
 
     @Test
-    void importBooksReturns202() throws Exception {
+    void importBooksReturns202WithCounts() throws Exception {
         var csv = "title,author,isbn,genre\nClean Code,Robert C. Martin,978-0132350884,Software Engineering\n";
         var file = new MockMultipartFile("file", "books-10.csv", "text/csv", csv.getBytes());
 
         mockMvc.perform(multipart("/books/import").file(file))
-                .andExpect(status().isAccepted());
+                .andExpect(status().isAccepted())
+                .andExpect(jsonPath("$.enqueued").value(1))
+                .andExpect(jsonPath("$.skipped").value(0));
     }
 
     @Test
@@ -108,9 +112,32 @@ class BookControllerTest {
         var file = new MockMultipartFile("file", "books.csv", "text/csv", csv.getBytes());
 
         mockMvc.perform(multipart("/books/import").file(file))
-                .andExpect(status().isAccepted());
+                .andExpect(status().isAccepted())
+                .andExpect(jsonPath("$.enqueued").value(1))
+                .andExpect(jsonPath("$.skipped").value(1));
 
         verify(bookUseCase, times(1)).importBook(any(CreateBookCommand.class));
+    }
+
+    @Test
+    void updateBookReturns200WithUpdatedBook() throws Exception {
+        when(bookUseCase.update(any(Long.class), any(CreateBookCommand.class))).thenReturn(
+                new Book(1L, "Updated Title", "Author", "978-0132350884", "Tech")
+        );
+
+        mockMvc.perform(put("/books/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"title":"Updated Title","author":"Author","isbn":"978-0132350884","genre":"Tech"}
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title").value("Updated Title"));
+    }
+
+    @Test
+    void deleteBookReturns204() throws Exception {
+        mockMvc.perform(delete("/books/1"))
+                .andExpect(status().isNoContent());
     }
 
     @Test

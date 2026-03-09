@@ -6,6 +6,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.redsoft.sandbox.domain.model.Book;
+import uk.co.redsoft.sandbox.domain.model.BookAlreadyExistsException;
+import uk.co.redsoft.sandbox.domain.model.BookNotFoundException;
 import uk.co.redsoft.sandbox.domain.model.CreateBookCommand;
 import uk.co.redsoft.sandbox.domain.ports.out.BookImportPort;
 import uk.co.redsoft.sandbox.domain.ports.out.BookStore;
@@ -14,8 +16,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -62,7 +64,7 @@ class BookServiceTest {
 
     @Test
     void createSavesAndReturnsBook() {
-        when(bookStore.save(any(CreateBookCommand.class))).thenReturn(
+        when(bookStore.save(any(Book.class))).thenReturn(
                 new Book(1L, "Clean Code", "Author", "978-0000000000", "Software Engineering"));
 
         var result = bookService.create(new CreateBookCommand("Clean Code", "Author", "978-0000000000", "Software Engineering"));
@@ -72,11 +74,61 @@ class BookServiceTest {
     }
 
     @Test
+    void createThrowsWhenIsbnAlreadyExists() {
+        when(bookStore.existsByIsbn("978-0000000000")).thenReturn(true);
+
+        assertThatThrownBy(() -> bookService.create(new CreateBookCommand("Duplicate", "Author", "978-0000000000", "Tech")))
+                .isInstanceOf(BookAlreadyExistsException.class)
+                .hasMessageContaining("978-0000000000");
+    }
+
+    @Test
     void importBookEnqueuesBook() {
         var command = new CreateBookCommand("Clean Code", "Robert C. Martin", "978-0132350884", "Software Engineering");
 
         bookService.importBook(command);
 
-        verify(bookImportPort).enqueue(command);
+        verify(bookImportPort).submitForImport(command);
+    }
+
+    @Test
+    void updateReturnsUpdatedBook() {
+        when(bookStore.findById(1L)).thenReturn(Optional.of(
+                new Book(1L, "Old Title", "Author", "978-0000000000", "Tech")
+        ));
+        when(bookStore.save(any(Book.class))).thenReturn(
+                new Book(1L, "New Title", "Author", "978-0000000000", "Tech")
+        );
+
+        var result = bookService.update(1L, new CreateBookCommand("New Title", "Author", "978-0000000000", "Tech"));
+
+        assertThat(result.title()).isEqualTo("New Title");
+    }
+
+    @Test
+    void updateThrowsWhenBookNotFound() {
+        when(bookStore.findById(99L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> bookService.update(99L, new CreateBookCommand("Title", "Author", "978-0000000000", "Tech")))
+                .isInstanceOf(BookNotFoundException.class);
+    }
+
+    @Test
+    void deleteRemovesBook() {
+        when(bookStore.findById(1L)).thenReturn(Optional.of(
+                new Book(1L, "Title", "Author", "978-0000000000", "Tech")
+        ));
+
+        bookService.delete(1L);
+
+        verify(bookStore).deleteById(1L);
+    }
+
+    @Test
+    void deleteThrowsWhenBookNotFound() {
+        when(bookStore.findById(99L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> bookService.delete(99L))
+                .isInstanceOf(BookNotFoundException.class);
     }
 }
