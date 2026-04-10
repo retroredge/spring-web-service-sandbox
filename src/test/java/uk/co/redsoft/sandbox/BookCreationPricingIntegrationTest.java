@@ -12,10 +12,11 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.MountableFile;
 import org.wiremock.integrations.testcontainers.WireMockContainer;
-import uk.co.redsoft.sandbox.adapters.out.persistence.JpaBookPriceRepository;
 import uk.co.redsoft.sandbox.domain.model.CreateBookCommand;
+import uk.co.redsoft.sandbox.domain.ports.in.BookDetailUseCase;
 import uk.co.redsoft.sandbox.domain.ports.in.BookUseCase;
 
+import java.math.BigDecimal;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,7 +24,7 @@ import static org.awaitility.Awaitility.await;
 
 @SpringBootTest
 @Testcontainers
-class SandboxApplicationTests {
+class BookCreationPricingIntegrationTest {
 
     @Container
     @ServiceConnection
@@ -49,20 +50,17 @@ class SandboxApplicationTests {
     private BookUseCase bookUseCase;
 
     @Autowired
-    private JpaBookPriceRepository jpaBookPriceRepository;
+    private BookDetailUseCase bookDetailUseCase;
 
     @Test
-    void contextLoads() {
-    }
-
-    @Test
-    void createBookTriggersAsyncPricingAndStoresPrices() {
-        bookUseCase.create(new CreateBookCommand(
-                "Clean Code", "Robert C. Martin", "978-0132350884", "Software Engineering"));
+    void creatingBookTriggersAsyncPricingVisibleViaBookDetail() {
+        var book = bookUseCase.create(new CreateBookCommand(
+                "Domain-Driven Design", "Eric Evans", "978-0321125217", "Software Architecture"));
 
         await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-            var prices = jpaBookPriceRepository.findByIdIsbn("978-0132350884");
-            assertThat(prices).hasSize(5);
+            var detail = bookDetailUseCase.getBookDetail(book.id());
+            assertThat(detail).isPresent();
+            assertThat(detail.get().gbrPrice()).isEqualByComparingTo(new BigDecimal("44.99"));
         });
     }
 }

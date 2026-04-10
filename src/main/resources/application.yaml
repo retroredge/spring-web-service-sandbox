@@ -23,6 +23,12 @@ management:
     env:
       enabled: true
 
+pricing:
+  catalogue:
+    base-url: http://localhost:8081
+    username: catalogue-user
+    password: secret
+
 info:
   app:
     name: Spring Boot Sandbox

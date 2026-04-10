@@ -1,7 +1,6 @@
 package uk.co.redsoft.sandbox;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -12,18 +11,15 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.MountableFile;
 import org.wiremock.integrations.testcontainers.WireMockContainer;
-import uk.co.redsoft.sandbox.adapters.out.persistence.JpaBookPriceRepository;
-import uk.co.redsoft.sandbox.domain.model.CreateBookCommand;
-import uk.co.redsoft.sandbox.domain.ports.in.BookUseCase;
 
-import java.util.concurrent.TimeUnit;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
-
+/**
+ * Smoke test: verifies the full Spring application context loads successfully
+ * with all infrastructure dependencies. Catches broken config before any
+ * feature-level tests run.
+ */
 @SpringBootTest
 @Testcontainers
-class SandboxApplicationTests {
+class ApplicationContextIntegrationTest {
 
     @Container
     @ServiceConnection
@@ -45,24 +41,7 @@ class SandboxApplicationTests {
         registry.add("pricing.catalogue.base-url", wiremock::getBaseUrl);
     }
 
-    @Autowired
-    private BookUseCase bookUseCase;
-
-    @Autowired
-    private JpaBookPriceRepository jpaBookPriceRepository;
-
     @Test
-    void contextLoads() {
-    }
-
-    @Test
-    void createBookTriggersAsyncPricingAndStoresPrices() {
-        bookUseCase.create(new CreateBookCommand(
-                "Clean Code", "Robert C. Martin", "978-0132350884", "Software Engineering"));
-
-        await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-            var prices = jpaBookPriceRepository.findByIdIsbn("978-0132350884");
-            assertThat(prices).hasSize(5);
-        });
+    void applicationContextLoads() {
     }
 }

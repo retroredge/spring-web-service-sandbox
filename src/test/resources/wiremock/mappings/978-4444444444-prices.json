@@ -1,0 +1,20 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/catalogue/books/978-4444444444/prices",
+    "basicAuthCredentials": {
+      "username": "catalogue-user",
+      "password": "secret"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "status": "accepted",
+      "isbn": "978-4444444444"
+    }
+  }
+}

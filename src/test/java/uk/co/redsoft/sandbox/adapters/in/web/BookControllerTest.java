@@ -2,13 +2,15 @@ package uk.co.redsoft.sandbox.adapters.in.web;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.co.redsoft.sandbox.domain.model.Book;
+import uk.co.redsoft.sandbox.domain.model.BookDetail;
 import uk.co.redsoft.sandbox.domain.model.CreateBookCommand;
+import uk.co.redsoft.sandbox.domain.ports.in.BookDetailUseCase;
 import uk.co.redsoft.sandbox.domain.ports.in.BookUseCase;
 
 import java.util.List;
@@ -34,6 +36,9 @@ class BookControllerTest {
     @MockitoBean
     private BookUseCase bookUseCase;
 
+    @MockitoBean
+    private BookDetailUseCase bookDetailUseCase;
+
     @Test
     void getAllBooksReturns200WithAllBooks() throws Exception {
         when(bookUseCase.findAll()).thenReturn(List.of(
@@ -49,21 +54,35 @@ class BookControllerTest {
     }
 
     @Test
-    void getBookReturns200WithBookWhenFound() throws Exception {
-        when(bookUseCase.findById(1L)).thenReturn(Optional.of(
-                new Book(1L, "The Pragmatic Programmer", "David Thomas & Andrew Hunt", "978-0135957059", "Software Engineering")
+    void getBookReturns200WithBookAndPriceWhenFound() throws Exception {
+        when(bookDetailUseCase.getBookDetail(1L)).thenReturn(Optional.of(
+                new BookDetail(1L, "The Pragmatic Programmer", "David Thomas & Andrew Hunt",
+                        "978-0135957059", "Software Engineering", new java.math.BigDecimal("29.99"))
         ));
 
         mockMvc.perform(get("/books/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.title").value("The Pragmatic Programmer"))
-                .andExpect(jsonPath("$.author").value("David Thomas & Andrew Hunt"));
+                .andExpect(jsonPath("$.author").value("David Thomas & Andrew Hunt"))
+                .andExpect(jsonPath("$.gbrPrice").value(29.99));
+    }
+
+    @Test
+    void getBookReturns200WithNullPriceWhenNoGbrPriceExists() throws Exception {
+        when(bookDetailUseCase.getBookDetail(1L)).thenReturn(Optional.of(
+                new BookDetail(1L, "The Pragmatic Programmer", "David Thomas & Andrew Hunt",
+                        "978-0135957059", "Software Engineering", null)
+        ));
+
+        mockMvc.perform(get("/books/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.gbrPrice").doesNotExist());
     }
 
     @Test
     void getBookReturns404WhenNotFound() throws Exception {
-        when(bookUseCase.findById(99L)).thenReturn(Optional.empty());
+        when(bookDetailUseCase.getBookDetail(99L)).thenReturn(Optional.empty());
 
         mockMvc.perform(get("/books/99"))
                 .andExpect(status().isNotFound());

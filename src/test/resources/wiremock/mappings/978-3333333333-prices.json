@@ -1,0 +1,17 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/catalogue/books/978-3333333333/prices",
+    "basicAuthCredentials": {
+      "username": "catalogue-user",
+      "password": "secret"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": "null"
+  }
+}

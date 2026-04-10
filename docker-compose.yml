@@ -22,6 +22,13 @@ services:
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
 
+  wiremock:
+    image: wiremock/wiremock:3.10.0
+    ports:
+      - "8081:8080"
+    volumes:
+      - ./src/test/resources/wiremock/mappings:/home/wiremock/mappings
+
   grafana:
     image: grafana/grafana
     ports:

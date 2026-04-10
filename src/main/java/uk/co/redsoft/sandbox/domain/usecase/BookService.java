@@ -7,6 +7,7 @@ import uk.co.redsoft.sandbox.domain.model.Book;
 import uk.co.redsoft.sandbox.domain.model.CreateBookCommand;
 import uk.co.redsoft.sandbox.domain.ports.in.BookUseCase;
 import uk.co.redsoft.sandbox.domain.ports.out.BookImportPort;
+import uk.co.redsoft.sandbox.domain.ports.out.BookPricingPublishPort;
 import uk.co.redsoft.sandbox.domain.ports.out.BookStore;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public class BookService implements BookUseCase {
 
     private final BookStore bookStore;
     private final BookImportPort bookImportPort;
+    private final BookPricingPublishPort bookPricingPublishPort;
 
     @Override
     public List<Book> findAll() {
@@ -32,7 +34,9 @@ public class BookService implements BookUseCase {
 
     @Override
     public Book create(CreateBookCommand command) {
-        return bookStore.save(new Book(null, command.title(), command.author(), command.isbn(), command.genre()));
+        var book = bookStore.save(new Book(null, command.title(), command.author(), command.isbn(), command.genre()));
+        bookPricingPublishPort.publish(book.isbn());
+        return book;
     }
 
     @Override

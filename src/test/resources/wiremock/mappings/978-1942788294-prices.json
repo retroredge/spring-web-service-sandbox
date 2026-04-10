@@ -1,0 +1,27 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/catalogue/books/978-1942788294/prices",
+    "basicAuthCredentials": {
+      "username": "catalogue-user",
+      "password": "secret"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "status": "accepted",
+      "isbn": "978-1942788294",
+      "prices": [
+        {"country_code": "GBR", "price": 19.99},
+        {"country_code": "USA", "price": 24.99},
+        {"country_code": "FRA", "price": 22.50},
+        {"country_code": "DEU", "price": 23.00},
+        {"country_code": "AUS", "price": 29.95}
+      ]
+    }
+  }
+}

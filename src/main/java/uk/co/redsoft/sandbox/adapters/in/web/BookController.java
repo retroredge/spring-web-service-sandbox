@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import uk.co.redsoft.sandbox.domain.model.Book;
+import uk.co.redsoft.sandbox.domain.model.BookDetail;
 import uk.co.redsoft.sandbox.domain.model.CreateBookCommand;
+import uk.co.redsoft.sandbox.domain.ports.in.BookDetailUseCase;
 import uk.co.redsoft.sandbox.domain.ports.in.BookUseCase;
 
 import java.io.IOException;
@@ -33,6 +35,7 @@ import java.util.List;
 public class BookController {
 
     private final BookUseCase bookUseCase;
+    private final BookDetailUseCase bookDetailUseCase;
     private final Validator validator;
 
     @GetMapping
@@ -41,8 +44,8 @@ public class BookController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Book> getBook(@PathVariable Long id) {
-        return bookUseCase.findById(id)
+    public ResponseEntity<BookDetail> getBook(@PathVariable Long id) {
+        return bookDetailUseCase.getBookDetail(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -75,4 +78,5 @@ public class BookController {
             }
         }
     }
+
 }

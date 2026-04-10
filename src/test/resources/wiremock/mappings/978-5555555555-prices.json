@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/catalogue/books/978-5555555555/prices",
+    "basicAuthCredentials": {
+      "username": "catalogue-user",
+      "password": "secret"
+    }
+  },
+  "response": {
+    "status": 500
+  }
+}

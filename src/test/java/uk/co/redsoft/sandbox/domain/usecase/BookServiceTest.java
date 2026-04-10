@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.redsoft.sandbox.domain.model.Book;
 import uk.co.redsoft.sandbox.domain.model.CreateBookCommand;
 import uk.co.redsoft.sandbox.domain.ports.out.BookImportPort;
+import uk.co.redsoft.sandbox.domain.ports.out.BookPricingPublishPort;
 import uk.co.redsoft.sandbox.domain.ports.out.BookStore;
 
 import java.util.List;
@@ -19,6 +20,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+
+
 @ExtendWith(MockitoExtension.class)
 class BookServiceTest {
 
@@ -27,6 +30,9 @@ class BookServiceTest {
 
     @Mock
     private BookImportPort bookImportPort;
+
+    @Mock
+    private BookPricingPublishPort bookPricingPublishPort;
 
     @InjectMocks
     private BookService bookService;
@@ -69,6 +75,17 @@ class BookServiceTest {
 
         assertThat(result.id()).isEqualTo(1L);
         assertThat(result.title()).isEqualTo("Clean Code");
+    }
+
+    @Test
+    void createPublishesIsbnToPricingQueue() {
+        var isbn = "978-0132350884";
+        when(bookStore.save(any(Book.class)))
+                .thenReturn(new Book(1L, "Clean Code", "Robert C. Martin", isbn, "Software Engineering"));
+
+        bookService.create(new CreateBookCommand("Clean Code", "Robert C. Martin", isbn, "Software Engineering"));
+
+        verify(bookPricingPublishPort).publish(isbn);
     }
 
     @Test

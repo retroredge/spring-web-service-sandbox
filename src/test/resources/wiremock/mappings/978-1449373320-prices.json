@@ -1,0 +1,27 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/catalogue/books/978-1449373320/prices",
+    "basicAuthCredentials": {
+      "username": "catalogue-user",
+      "password": "secret"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "status": "accepted",
+      "isbn": "978-1449373320",
+      "prices": [
+        {"country_code": "GBR", "price": 49.99},
+        {"country_code": "USA", "price": 59.99},
+        {"country_code": "FRA", "price": 54.50},
+        {"country_code": "DEU", "price": 55.00},
+        {"country_code": "AUS", "price": 74.95}
+      ]
+    }
+  }
+}

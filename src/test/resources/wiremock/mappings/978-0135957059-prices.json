@@ -1,0 +1,27 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/catalogue/books/978-0135957059/prices",
+    "basicAuthCredentials": {
+      "username": "catalogue-user",
+      "password": "secret"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "status": "accepted",
+      "isbn": "978-0135957059",
+      "prices": [
+        {"country_code": "GBR", "price": 29.99},
+        {"country_code": "USA", "price": 39.99},
+        {"country_code": "FRA", "price": 34.50},
+        {"country_code": "DEU", "price": 36.00},
+        {"country_code": "AUS", "price": 44.95}
+      ]
+    }
+  }
+}
