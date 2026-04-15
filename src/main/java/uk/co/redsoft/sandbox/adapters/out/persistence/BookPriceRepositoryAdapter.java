@@ -2,6 +2,7 @@ package uk.co.redsoft.sandbox.adapters.out.persistence;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import uk.co.redsoft.sandbox.domain.model.BookPrice;
 import uk.co.redsoft.sandbox.domain.ports.out.PriceRepositoryPort;
 
@@ -19,6 +20,12 @@ public class BookPriceRepositoryAdapter implements PriceRepositoryPort {
                 .map(p -> new BookPriceEntity(p.isbn(), p.countryCode(), p.price()))
                 .toList();
         jpaBookPriceRepository.saveAll(entities);
+    }
+
+    @Override
+    @Transactional
+    public void deleteByIsbn(String isbn) {
+        jpaBookPriceRepository.deleteByIsbn(isbn);
     }
 
     @Override

@@ -7,8 +7,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Getter;
+import org.hibernate.annotations.Generated;
+import org.hibernate.annotations.GenerationTime;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 
 @Getter
 @Entity
@@ -26,6 +29,10 @@ public class BookPriceEntity {
 
     @Column(precision = 10, scale = 2)
     private BigDecimal price;
+
+    @Generated(GenerationTime.INSERT)
+    @Column(name = "created_at", insertable = false, updatable = false)
+    private Instant createdAt;
 
     protected BookPriceEntity() {}
 

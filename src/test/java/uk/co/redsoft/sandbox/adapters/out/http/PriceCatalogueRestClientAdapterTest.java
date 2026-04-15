@@ -63,6 +63,15 @@ class PriceCatalogueRestClientAdapterTest {
     }
 
     @Test
+    void filtersOutItemsWithMissingOrBlankCountryCodeOrNullPrice() {
+        // stub returns 4 items: 1 valid (GBR), 1 blank country code, 1 null price, 1 null country code
+        var prices = adapter.fetchPrices("978-2222222222");
+
+        assertThat(prices).hasSize(1);
+        assertThat(prices.get(0).countryCode()).isEqualTo("GBR");
+    }
+
+    @Test
     void fetchesPricesAndMapsToDomainModel() {
         var isbn = "978-0132350884";
 

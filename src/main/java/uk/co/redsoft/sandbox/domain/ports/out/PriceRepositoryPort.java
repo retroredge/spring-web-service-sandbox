@@ -9,4 +9,6 @@ public interface PriceRepositoryPort {
     void saveAll(List<BookPrice> prices);
 
     List<BookPrice> findByIsbn(String isbn);
+
+    void deleteByIsbn(String isbn);
 }

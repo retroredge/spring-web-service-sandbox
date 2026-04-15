@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @Testcontainers
-class BookRepositoryIntegrationTest {
+class JpaBookRepositoryIntegrationTest {
 
     @Container
     @ServiceConnection
@@ -27,6 +27,16 @@ class BookRepositoryIntegrationTest {
 
     @Autowired
     private JpaBookRepository jpaBookRepository;
+
+    @Test
+    void findAllReturnsAllSavedBooks() {
+        jpaBookRepository.save(new BookEntity("Clean Code", "Robert C. Martin", "978-0132350884", "Software Engineering"));
+        jpaBookRepository.save(new BookEntity("Designing Data-Intensive Applications", "Martin Kleppmann", "978-1449373320", "Software Engineering"));
+
+        var books = jpaBookRepository.findAll();
+
+        assertThat(books).hasSizeGreaterThanOrEqualTo(2);
+    }
 
     @Test
     void savedBookHasDbGeneratedIdAndCreatedAt() {

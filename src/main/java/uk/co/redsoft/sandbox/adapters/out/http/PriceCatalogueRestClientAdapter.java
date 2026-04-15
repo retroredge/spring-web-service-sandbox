@@ -38,7 +38,14 @@ public class PriceCatalogueRestClientAdapter implements PriceCataloguePort {
         }
 
         return response.prices().stream()
+                .filter(this::isValid)
                 .map(r -> new BookPrice(isbn, r.countryCode(), r.price()))
                 .toList();
+    }
+
+    private boolean isValid(BookPriceResponse item) {
+        return item != null
+                && item.countryCode() != null && !item.countryCode().isBlank()
+                && item.price() != null;
     }
 }

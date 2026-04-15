@@ -11,6 +11,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -18,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Testcontainers
-class BookPriceRepositoryTest {
+class JpaBookPriceRepositoryIntegrationTest {
 
     @Container
     @ServiceConnection
@@ -29,6 +30,18 @@ class BookPriceRepositoryTest {
 
     @Autowired
     private EntityManager entityManager;
+
+    @Test
+    void savedBookPriceHasDbGeneratedCreatedAt() {
+        var saved = jpaBookPriceRepository.save(new BookPriceEntity("978-0132350884", "GBR", new BigDecimal("24.99")));
+
+        var found = jpaBookPriceRepository.findById(saved.getId());
+
+        assertThat(found).isPresent();
+        var entity = found.get();
+        assertThat(entity.getCreatedAt()).isNotNull();
+        assertThat(entity.getCreatedAt()).isBeforeOrEqualTo(Instant.now());
+    }
 
     @Test
     void savesAllPricesForIsbn() {
@@ -52,7 +65,21 @@ class BookPriceRepositoryTest {
     }
 
     @Test
-    void duplicateIsbnAndCountryViolatesPrimaryKeyConstraint() {
+    void deleteByIsbnRemovesOnlyPricesForThatIsbn() {
+        var isbn1 = "978-0132350884";
+        var isbn2 = "978-0135957059";
+        jpaBookPriceRepository.save(new BookPriceEntity(isbn1, "GBR", new BigDecimal("24.99")));
+        jpaBookPriceRepository.save(new BookPriceEntity(isbn1, "USA", new BigDecimal("34.99")));
+        jpaBookPriceRepository.save(new BookPriceEntity(isbn2, "GBR", new BigDecimal("29.99")));
+
+        jpaBookPriceRepository.deleteByIsbn(isbn1);
+
+        assertThat(jpaBookPriceRepository.findByIsbn(isbn1)).isEmpty();
+        assertThat(jpaBookPriceRepository.findByIsbn(isbn2)).hasSize(1);
+    }
+
+    @Test
+    void duplicateIsbnAndCountryViolatesUniqueConstraint() {
         var isbn = "978-0135957059";
         entityManager.persist(new BookPriceEntity(isbn, "GBR", new BigDecimal("29.99")));
         entityManager.flush();

@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Testcontainers
 @AutoConfigureWireMock(port = 0, files = "classpath:/wiremock")
 @TestPropertySource(properties = "pricing.catalogue.base-url=http://localhost:${wiremock.server.port}")
-class PriceCataloguePortIntegrationTest {
+class PriceCatalogueRestClientAdapterIntegrationTest {
 
     @Container
     @ServiceConnection

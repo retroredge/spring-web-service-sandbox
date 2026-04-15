@@ -7,4 +7,6 @@ import java.util.List;
 public interface JpaBookPriceRepository extends JpaRepository<BookPriceEntity, Long> {
 
     List<BookPriceEntity> findByIsbn(String isbn);
+
+    void deleteByIsbn(String isbn);
 }

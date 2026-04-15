@@ -1,0 +1,26 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/catalogue/books/978-2222222222/prices",
+    "basicAuthCredentials": {
+      "username": "catalogue-user",
+      "password": "secret"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "status": "accepted",
+      "isbn": "978-2222222222",
+      "prices": [
+        {"country_code": "GBR", "price": 24.99},
+        {"country_code": "",    "price": 19.99},
+        {"country_code": "USA", "price": null},
+        {"country_code": null,  "price": 29.99}
+      ]
+    }
+  }
+}

@@ -23,7 +23,7 @@ import static org.awaitility.Awaitility.await;
 
 @SpringBootTest
 @Testcontainers
-class SandboxApplicationTests {
+class SandboxApplicationIntegrationTest {
 
     @Container
     @ServiceConnection
@@ -50,10 +50,6 @@ class SandboxApplicationTests {
 
     @Autowired
     private JpaBookPriceRepository jpaBookPriceRepository;
-
-    @Test
-    void contextLoads() {
-    }
 
     @Test
     void createBookTriggersAsyncPricingAndStoresPrices() {
