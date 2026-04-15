@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Testcontainers
-class PriceCatalogueAdapterTest {
+class PriceCatalogueRestClientAdapterTest {
 
     @Container
     static WireMockContainer wiremock = new WireMockContainer("wiremock/wiremock:3.10.0")
@@ -24,7 +24,7 @@ class PriceCatalogueAdapterTest {
                     "/home/wiremock/mappings/"
             );
 
-    private PriceCatalogueAdapter adapter;
+    private PriceCatalogueRestClientAdapter adapter;
 
     @BeforeEach
     void setUp() {
@@ -32,7 +32,7 @@ class PriceCatalogueAdapterTest {
                 .baseUrl(wiremock.getBaseUrl())
                 .defaultHeaders(headers -> headers.setBasicAuth("catalogue-user", "secret"))
                 .build();
-        adapter = new PriceCatalogueAdapter(restClient);
+        adapter = new PriceCatalogueRestClientAdapter(restClient);
     }
 
     @Test

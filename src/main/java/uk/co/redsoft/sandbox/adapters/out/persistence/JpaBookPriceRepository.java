@@ -4,7 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface JpaBookPriceRepository extends JpaRepository<BookPriceEntity, BookPriceId> {
+public interface JpaBookPriceRepository extends JpaRepository<BookPriceEntity, Long> {
 
-    List<BookPriceEntity> findByIdIsbn(String isbn);
+    List<BookPriceEntity> findByIsbn(String isbn);
 }

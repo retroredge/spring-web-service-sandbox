@@ -1,11 +1,16 @@
 package uk.co.redsoft.sandbox.adapters.out.persistence;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Getter;
+import org.hibernate.annotations.Generated;
+import org.hibernate.annotations.GenerationTime;
+
+import java.time.Instant;
 
 @Getter
 @Entity
@@ -19,6 +24,10 @@ public class BookEntity {
     private String author;
     private String isbn;
     private String genre;
+
+    @Generated(GenerationTime.INSERT)
+    @Column(name = "created_at", insertable = false, updatable = false)
+    private Instant createdAt;
 
     protected BookEntity() {
     }

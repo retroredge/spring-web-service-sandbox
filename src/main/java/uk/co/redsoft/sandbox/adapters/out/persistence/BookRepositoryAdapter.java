@@ -3,14 +3,14 @@ package uk.co.redsoft.sandbox.adapters.out.persistence;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import uk.co.redsoft.sandbox.domain.model.Book;
-import uk.co.redsoft.sandbox.domain.ports.out.BookStore;
+import uk.co.redsoft.sandbox.domain.ports.out.BookRepositoryPort;
 
 import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
 @Component
-public class BookRepositoryAdapter implements BookStore {
+public class BookRepositoryAdapter implements BookRepositoryPort {
 
     private final JpaBookRepository jpaBookRepository;
 

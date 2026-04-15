@@ -37,16 +37,16 @@ class BookPriceRepositoryTest {
         jpaBookPriceRepository.save(new BookPriceEntity(isbn, "USA", new BigDecimal("34.99")));
         jpaBookPriceRepository.save(new BookPriceEntity(isbn, "FRA", new BigDecimal("29.95")));
 
-        var prices = jpaBookPriceRepository.findByIdIsbn(isbn);
+        var prices = jpaBookPriceRepository.findByIsbn(isbn);
 
         assertThat(prices).hasSize(3);
-        assertThat(prices).extracting(e -> e.getId().countryCode())
+        assertThat(prices).extracting(BookPriceEntity::getCountryCode)
                 .containsExactlyInAnyOrder("GBR", "USA", "FRA");
     }
 
     @Test
     void findByIsbnReturnsEmptyListForUnknownIsbn() {
-        var prices = jpaBookPriceRepository.findByIdIsbn("978-9999999999");
+        var prices = jpaBookPriceRepository.findByIsbn("978-9999999999");
 
         assertThat(prices).isEmpty();
     }

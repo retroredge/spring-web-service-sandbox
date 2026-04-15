@@ -11,7 +11,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Component
-public class PriceCatalogueAdapter implements PriceCataloguePort {
+public class PriceCatalogueRestClientAdapter implements PriceCataloguePort {
 
     private final RestClient restClient;
 

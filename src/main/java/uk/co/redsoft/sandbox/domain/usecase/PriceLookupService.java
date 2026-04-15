@@ -6,7 +6,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import uk.co.redsoft.sandbox.domain.ports.in.PriceLookupUseCase;
 import uk.co.redsoft.sandbox.domain.ports.out.PriceCataloguePort;
-import uk.co.redsoft.sandbox.domain.ports.out.PriceStore;
+import uk.co.redsoft.sandbox.domain.ports.out.PriceRepositoryPort;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -14,7 +14,7 @@ import uk.co.redsoft.sandbox.domain.ports.out.PriceStore;
 public class PriceLookupService implements PriceLookupUseCase {
 
     private final PriceCataloguePort priceCataloguePort;
-    private final PriceStore priceStore;
+    private final PriceRepositoryPort priceStore;
 
     @Override
     public void lookupAndStorePrices(String isbn) {

@@ -7,7 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.redsoft.sandbox.domain.model.BookPrice;
 import uk.co.redsoft.sandbox.domain.ports.out.PriceCataloguePort;
-import uk.co.redsoft.sandbox.domain.ports.out.PriceStore;
+import uk.co.redsoft.sandbox.domain.ports.out.PriceRepositoryPort;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -23,7 +23,7 @@ class PriceLookupServiceTest {
     private PriceCataloguePort priceCataloguePort;
 
     @Mock
-    private PriceStore priceStore;
+    private PriceRepositoryPort priceStore;
 
     @InjectMocks
     private PriceLookupService priceLookupService;

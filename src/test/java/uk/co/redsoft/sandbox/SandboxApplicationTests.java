@@ -61,7 +61,7 @@ class SandboxApplicationTests {
                 "Clean Code", "Robert C. Martin", "978-0132350884", "Software Engineering"));
 
         await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
-            var prices = jpaBookPriceRepository.findByIdIsbn("978-0132350884");
+            var prices = jpaBookPriceRepository.findByIsbn("978-0132350884");
             assertThat(prices).hasSize(5);
         });
     }

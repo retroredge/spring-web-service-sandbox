@@ -9,6 +9,7 @@ import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,6 +37,8 @@ class BookRepositoryTest {
 
         assertThat(found).isPresent();
         assertThat(found.get().getTitle()).isEqualTo("The Pragmatic Programmer");
+        assertThat(found.get().getCreatedAt()).isNotNull();
+        assertThat(found.get().getCreatedAt()).isBeforeOrEqualTo(Instant.now());
     }
 
     @Test

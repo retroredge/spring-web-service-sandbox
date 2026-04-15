@@ -5,8 +5,8 @@ import org.springframework.stereotype.Service;
 import uk.co.redsoft.sandbox.domain.model.BookDetail;
 import uk.co.redsoft.sandbox.domain.model.BookPrice;
 import uk.co.redsoft.sandbox.domain.ports.in.BookDetailUseCase;
-import uk.co.redsoft.sandbox.domain.ports.out.BookStore;
-import uk.co.redsoft.sandbox.domain.ports.out.PriceStore;
+import uk.co.redsoft.sandbox.domain.ports.out.BookRepositoryPort;
+import uk.co.redsoft.sandbox.domain.ports.out.PriceRepositoryPort;
 
 import java.util.Optional;
 
@@ -16,8 +16,8 @@ public class BookDetailService implements BookDetailUseCase {
 
     private static final String DEFAULT_COUNTRY_CODE = "GBR";
 
-    private final BookStore bookStore;
-    private final PriceStore priceStore;
+    private final BookRepositoryPort bookStore;
+    private final PriceRepositoryPort priceStore;
 
     @Override
     public Optional<BookDetail> getBookDetail(Long id) {

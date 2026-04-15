@@ -7,8 +7,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.redsoft.sandbox.domain.model.Book;
 import uk.co.redsoft.sandbox.domain.model.BookPrice;
-import uk.co.redsoft.sandbox.domain.ports.out.BookStore;
-import uk.co.redsoft.sandbox.domain.ports.out.PriceStore;
+import uk.co.redsoft.sandbox.domain.ports.out.BookRepositoryPort;
+import uk.co.redsoft.sandbox.domain.ports.out.PriceRepositoryPort;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -21,10 +21,10 @@ import static org.mockito.Mockito.when;
 class BookDetailServiceTest {
 
     @Mock
-    private BookStore bookStore;
+    private BookRepositoryPort bookStore;
 
     @Mock
-    private PriceStore priceStore;
+    private PriceRepositoryPort priceStore;
 
     @InjectMocks
     private BookDetailService bookDetailService;

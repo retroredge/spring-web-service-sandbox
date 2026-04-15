@@ -4,7 +4,7 @@ import uk.co.redsoft.sandbox.domain.model.BookPrice;
 
 import java.util.List;
 
-public interface PriceStore {
+public interface PriceRepositoryPort {
 
     void saveAll(List<BookPrice> prices);
 

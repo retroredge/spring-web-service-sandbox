@@ -8,7 +8,7 @@ import uk.co.redsoft.sandbox.domain.model.CreateBookCommand;
 import uk.co.redsoft.sandbox.domain.ports.in.BookUseCase;
 import uk.co.redsoft.sandbox.domain.ports.out.BookImportPort;
 import uk.co.redsoft.sandbox.domain.ports.out.BookPricingPublishPort;
-import uk.co.redsoft.sandbox.domain.ports.out.BookStore;
+import uk.co.redsoft.sandbox.domain.ports.out.BookRepositoryPort;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,7 +18,7 @@ import java.util.Optional;
 @Service
 public class BookService implements BookUseCase {
 
-    private final BookStore bookStore;
+    private final BookRepositoryPort bookStore;
     private final BookImportPort bookImportPort;
     private final BookPricingPublishPort bookPricingPublishPort;
 

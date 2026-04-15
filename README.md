@@ -79,11 +79,11 @@ C4Component
         Component(bookService, "BookService", "Spring Service", "BookUseCase — creates, imports and queries books")
         Component(bookDetailService, "BookDetailService", "Spring Service", "BookDetailUseCase — returns book with GBR price")
         Component(priceLookupService, "PriceLookupService", "Spring Service", "PriceLookupUseCase — fetches and stores prices")
-        Component(bookRepoAdapter, "BookRepositoryAdapter", "Spring Data JPA", "Implements BookStore port")
-        Component(bookPriceRepoAdapter, "BookPriceRepositoryAdapter", "Spring Data JPA", "Implements PriceStore port")
+        Component(bookRepoAdapter, "BookRepositoryAdapter", "Spring Data JPA", "Implements BookRepositoryPort port")
+        Component(bookPriceRepoAdapter, "BookPriceRepositoryAdapter", "Spring Data JPA", "Implements PriceRepositoryPort port")
         Component(rabbitImportAdapter, "RabbitBookPublishAdapter", "Spring AMQP", "Implements BookImportPort")
         Component(rabbitPricingAdapter, "RabbitBookPricingPublishAdapter", "Spring AMQP", "Implements BookPricingPublishPort")
-        Component(priceCatalogueAdapter, "PriceCatalogueAdapter", "RestClient", "Implements PriceCataloguePort")
+        Component(priceCatalogueAdapter, "PriceCatalogueRestClientAdapter", "RestClient", "Implements PriceCataloguePort")
     }
     Rel(client, bookController, "HTTP REST")
     Rel(rabbitmq, bookImportListener, "books.import", "AMQP")
@@ -92,13 +92,13 @@ C4Component
     Rel(bookController, bookDetailService, "uses")
     Rel(bookImportListener, bookService, "uses")
     Rel(bookPricingListener, priceLookupService, "uses")
-    Rel(bookService, bookRepoAdapter, "BookStore")
+    Rel(bookService, bookRepoAdapter, "BookRepositoryPort")
     Rel(bookService, rabbitImportAdapter, "BookImportPort")
     Rel(bookService, rabbitPricingAdapter, "BookPricingPublishPort")
-    Rel(bookDetailService, bookRepoAdapter, "BookStore")
-    Rel(bookDetailService, bookPriceRepoAdapter, "PriceStore")
+    Rel(bookDetailService, bookRepoAdapter, "BookRepositoryPort")
+    Rel(bookDetailService, bookPriceRepoAdapter, "PriceRepositoryPort")
     Rel(priceLookupService, priceCatalogueAdapter, "PriceCataloguePort")
-    Rel(priceLookupService, bookPriceRepoAdapter, "PriceStore")
+    Rel(priceLookupService, bookPriceRepoAdapter, "PriceRepositoryPort")
     Rel(bookRepoAdapter, mysql, "JDBC/JPA")
     Rel(bookPriceRepoAdapter, mysql, "JDBC/JPA")
     Rel(rabbitImportAdapter, rabbitmq, "books.import", "AMQP")
@@ -122,7 +122,7 @@ The core of the application — no framework or infrastructure dependencies.
 |---------|----------|
 | `domain.model` | Domain objects (e.g. `Book`, `BookPrice`, `BookDetail`) |
 | `domain.ports.in` | Incoming port interfaces — use cases the domain exposes to the outside world (e.g. `BookUseCase`, `BookDetailUseCase`, `PriceLookupUseCase`) |
-| `domain.ports.out` | Outgoing port interfaces — abstractions the domain requires of infrastructure (e.g. `BookStore`, `BookImportPort`, `BookPricingPublishPort`, `PriceCataloguePort`, `PriceStore`) |
+| `domain.ports.out` | Outgoing port interfaces — abstractions the domain requires of infrastructure (e.g. `BookRepositoryPort`, `BookImportPort`, `BookPricingPublishPort`, `PriceCataloguePort`, `PriceRepositoryPort`) |
 | `domain.usecase` | Implementations of the incoming ports (e.g. `BookService`, `BookDetailService`, `PriceLookupService`) |
 
 ### `adapters`
@@ -344,7 +344,7 @@ sequenceDiagram
       participant BookImportPort as RabbitBookPublishAdapter
       participant RabbitMQ
       participant BookImportListener
-      participant BookStore as BookRepositoryAdapter
+      participant BookRepositoryPort as BookRepositoryAdapter
       participant JpaBookRepository
 
       Client->>BookController: POST /books/import (CSV file)
@@ -371,12 +371,12 @@ sequenceDiagram
       loop for each queued message
           RabbitMQ->>BookImportListener: onMessage(CreateBookCommand)
           BookImportListener->>BookUseCase: create(command)
-          BookUseCase->>BookStore: save(command)
-          BookStore->>BookStore: toEntity(command)
-          BookStore->>JpaBookRepository: save(entity)
-          JpaBookRepository-->>BookStore: BookEntity
-          BookStore->>BookStore: toBook(entity)
-          BookStore-->>BookUseCase: Book
+          BookUseCase->>BookRepositoryPort: save(command)
+          BookRepositoryPort->>BookRepositoryPort: toEntity(command)
+          BookRepositoryPort->>JpaBookRepository: save(entity)
+          JpaBookRepository-->>BookRepositoryPort: BookEntity
+          BookRepositoryPort->>BookRepositoryPort: toBook(entity)
+          BookRepositoryPort-->>BookUseCase: Book
           BookUseCase-->>BookImportListener: Book
       end
 ```
@@ -392,22 +392,22 @@ sequenceDiagram
     actor Client
     participant BookController
     participant BookUseCase as BookService
-    participant BookStore as BookRepositoryAdapter
+    participant BookRepositoryPort as BookRepositoryAdapter
     participant JpaBookRepository
     participant BookPricingPublishPort as RabbitBookPricingPublishAdapter
     participant RabbitMQ
     participant BookPricingListener
     participant PriceLookupUseCase as PriceLookupService
-    participant PriceCataloguePort as PriceCatalogueAdapter
-    participant PriceStore as BookPriceRepositoryAdapter
+    participant PriceCataloguePort as PriceCatalogueRestClientAdapter
+    participant PriceRepositoryPort as BookPriceRepositoryAdapter
     participant JpaBookPriceRepository
 
     Client->>BookController: POST /books (title, author, isbn, genre)
     BookController->>BookUseCase: create(CreateBookCommand)
-    BookUseCase->>BookStore: save(Book)
-    BookStore->>JpaBookRepository: save(BookEntity)
-    JpaBookRepository-->>BookStore: BookEntity
-    BookStore-->>BookUseCase: Book
+    BookUseCase->>BookRepositoryPort: save(Book)
+    BookRepositoryPort->>JpaBookRepository: save(BookEntity)
+    JpaBookRepository-->>BookRepositoryPort: BookEntity
+    BookRepositoryPort-->>BookUseCase: Book
     BookUseCase->>BookPricingPublishPort: publish(isbn)
     BookPricingPublishPort->>RabbitMQ: convertAndSend(books.pricing, BookPricingMessage)
     BookUseCase-->>BookController: Book
@@ -422,8 +422,8 @@ sequenceDiagram
     PriceCataloguePort-->>PriceLookupUseCase: List<BookPrice>
 
     alt prices found
-        PriceLookupUseCase->>PriceStore: saveAll(prices)
-        PriceStore->>JpaBookPriceRepository: saveAll(BookPriceEntity list)
+        PriceLookupUseCase->>PriceRepositoryPort: saveAll(prices)
+        PriceRepositoryPort->>JpaBookPriceRepository: saveAll(BookPriceEntity list)
     else no prices returned
         PriceLookupUseCase->>PriceLookupUseCase: log.warn + return
     end
