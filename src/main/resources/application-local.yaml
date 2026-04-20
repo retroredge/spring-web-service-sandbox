@@ -6,3 +6,7 @@ management:
 logging:
   level:
     uk.co.redsoft.sandbox: DEBUG
+
+pricing:
+  catalogue:
+    skip-ssl: true

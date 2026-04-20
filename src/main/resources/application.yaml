@@ -28,6 +28,7 @@ pricing:
     base-url: http://localhost:8081
     username: catalogue-user
     password: secret
+    skip-ssl: false
 
 info:
   app:
