@@ -1,5 +1,7 @@
 package uk.co.redsoft.sandbox.adapters.out.http;
 
+import io.micrometer.core.annotation.Timed;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
@@ -14,7 +16,9 @@ import java.util.List;
 public class PriceCatalogueRestClientAdapter implements PriceCataloguePort {
 
     private final RestClient restClient;
+    private final MeterRegistry meterRegistry;
 
+    @Timed("books.pricing.catalogue.fetch")
     @Override
     public List<BookPrice> fetchPrices(String isbn) {
         PriceCatalogueResponse response;
@@ -30,7 +34,11 @@ public class PriceCatalogueRestClientAdapter implements PriceCataloguePort {
                     })
                     .body(PriceCatalogueResponse.class);
         } catch (BookPricesNotFoundException e) {
+            meterRegistry.counter("books.pricing.catalogue.error", "type", "not_found").increment();
             return List.of();
+        } catch (PriceCatalogueException e) {
+            meterRegistry.counter("books.pricing.catalogue.error", "type", "server_error").increment();
+            throw e;
         }
 
         if (response == null || response.prices() == null) {

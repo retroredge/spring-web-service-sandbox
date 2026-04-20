@@ -1,5 +1,6 @@
 package uk.co.redsoft.sandbox.adapters.out.http;
 
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.junit.jupiter.Container;
@@ -32,7 +33,7 @@ class PriceCatalogueRestClientAdapterTest {
                 .baseUrl(wiremock.getBaseUrl())
                 .defaultHeaders(headers -> headers.setBasicAuth("catalogue-user", "secret"))
                 .build();
-        adapter = new PriceCatalogueRestClientAdapter(restClient);
+        adapter = new PriceCatalogueRestClientAdapter(restClient, new SimpleMeterRegistry());
     }
 
     @Test

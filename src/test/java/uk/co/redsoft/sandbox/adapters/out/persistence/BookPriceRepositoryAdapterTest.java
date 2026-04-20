@@ -1,9 +1,11 @@
 package uk.co.redsoft.sandbox.adapters.out.persistence;
 
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.redsoft.sandbox.domain.model.BookPrice;
 
@@ -21,6 +23,9 @@ class BookPriceRepositoryAdapterTest {
 
     @Mock
     private JpaBookPriceRepository jpaBookPriceRepository;
+
+    @Spy
+    private SimpleMeterRegistry meterRegistry = new SimpleMeterRegistry();
 
     @InjectMocks
     private BookPriceRepositoryAdapter adapter;
