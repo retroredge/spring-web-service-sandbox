@@ -12,9 +12,10 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.MountableFile;
 import org.wiremock.integrations.testcontainers.WireMockContainer;
-import uk.co.redsoft.sandbox.domain.model.CreateBookCommand;
+import uk.co.redsoft.sandbox.domain.model.Book;
 import uk.co.redsoft.sandbox.domain.ports.in.BookDetailUseCase;
-import uk.co.redsoft.sandbox.domain.ports.in.BookUseCase;
+import uk.co.redsoft.sandbox.adapters.out.messaging.RabbitBookPricingPublishAdapter;
+import uk.co.redsoft.sandbox.domain.ports.out.BookRepositoryPort;
 
 import java.math.BigDecimal;
 import java.util.concurrent.TimeUnit;
@@ -47,15 +48,19 @@ class BookCreationPricingIntegrationTest {
     }
 
     @Autowired
-    private BookUseCase bookUseCase;
+    private BookRepositoryPort bookRepositoryPort;
+
+    @Autowired
+    private RabbitBookPricingPublishAdapter bookPricingPublishPort;
 
     @Autowired
     private BookDetailUseCase bookDetailUseCase;
 
     @Test
     void creatingBookTriggersAsyncPricingVisibleViaBookDetail() {
-        var book = bookUseCase.create(new CreateBookCommand(
-                "Domain-Driven Design", "Eric Evans", "978-0321125217", "Software Architecture"));
+        var book = bookRepositoryPort.save(
+                new Book(null, "Domain-Driven Design", "Eric Evans", "978-0321125217", "Software Architecture"));
+        bookPricingPublishPort.publish(book.isbn());
 
         await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
             var detail = bookDetailUseCase.getBookDetail(book.id());
