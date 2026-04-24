@@ -18,10 +18,14 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,metrics,info,env,loggers,mappings,scheduledtasks,httpexchanges,beans,prometheus
+        include: health,metrics,info,env,loggers,mappings,scheduledtasks,httpexchanges,beans,prometheus,book-pricing-listener
   info:
     env:
       enabled: true
+
+messaging:
+  pricing-listener:
+    enabled: true
 
 pricing:
   catalogue:

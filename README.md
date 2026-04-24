@@ -283,6 +283,7 @@ curl -X POST http://localhost:8080/books/import -F "file=@src/test/resources/boo
 | `http://localhost:8080/actuator/httpexchanges` | Recent HTTP request/response history |
 | `http://localhost:8080/actuator/beans` | All Spring beans in the application context |
 | `http://localhost:8080/actuator/prometheus` | Prometheus metrics scrape endpoint |
+| `http://localhost:8080/actuator/book-pricing-listener` | Read or toggle the book pricing listener feature flag |
 
 ## Book pricing
 
@@ -328,6 +329,43 @@ Price data is stored in a separate `book_prices` table with a composite primary 
 ```sql
 SELECT * FROM book_prices WHERE isbn = '978-0132350884';
 ```
+
+### Book pricing listener feature flag
+
+The `books.pricing` listener can be paused and resumed at runtime without restarting the application. When paused, messages accumulate in the RabbitMQ queue and are consumed once the listener is re-enabled.
+
+**Check current state:**
+
+```bash
+curl http://localhost:8080/actuator/book-pricing-listener
+# {"enabled":true}
+```
+
+**Disable (pause consumption — messages queue up):**
+
+```bash
+curl -X POST http://localhost:8080/actuator/book-pricing-listener/disable
+# {"enabled":false}
+```
+
+**Re-enable (consumption resumes — queued messages are processed):**
+
+```bash
+curl -X POST http://localhost:8080/actuator/book-pricing-listener/enable
+# {"enabled":true}
+```
+
+While the listener is disabled you can observe messages accumulating in the RabbitMQ management UI at `http://localhost:15672` under the `books.pricing` queue.
+
+**Configure the startup default** in `application.yaml`:
+
+```yaml
+messaging:
+  pricing-listener:
+    enabled: true   # set to false to start with the listener paused
+```
+
+---
 
 ## Sequence Diagram for the import books journey
 

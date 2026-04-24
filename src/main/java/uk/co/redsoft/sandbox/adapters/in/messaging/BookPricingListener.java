@@ -17,7 +17,7 @@ public class BookPricingListener {
     private final PriceLookupUseCase priceLookupUseCase;
 
     @Timed("books.pricing.listener")
-    @RabbitListener(queues = RabbitConfig.PRICING_QUEUE)
+    @RabbitListener(id = "bookPricingListener", queues = RabbitConfig.PRICING_QUEUE) // id must match ListenerContainerService.LISTENER_ID
     public void onMessage(BookPricingMessage message) {
         log.debug("Received pricing request for ISBN: {}", message.isbn());
         priceLookupUseCase.lookupAndStorePrices(message.isbn());
