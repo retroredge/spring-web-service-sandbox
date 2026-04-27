@@ -1,5 +1,6 @@
 package uk.co.redsoft.sandbox.adapters.in.actuator;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.rabbit.listener.RabbitListenerEndpointRegistry;
@@ -41,6 +42,11 @@ class BookPricingListenerEndpointIntegrationTest extends AbstractWireMockContain
 
     @Autowired
     private JpaBookPriceRepository jpaBookPriceRepository;
+
+    @BeforeEach
+    void cleanPrices() {
+        jpaBookPriceRepository.deleteAll();
+    }
 
     @Test
     void getState_returnsEnabledTrue_byDefault() throws Exception {

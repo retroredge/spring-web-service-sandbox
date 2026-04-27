@@ -1,5 +1,6 @@
 package uk.co.redsoft.sandbox.domain.usecase;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,6 +26,11 @@ class BookDetailServiceIntegrationTest extends AbstractContainersIntegrationTest
 
     @Autowired
     private JpaBookPriceRepository jpaBookPriceRepository;
+
+    @BeforeEach
+    void cleanPrices() {
+        jpaBookPriceRepository.deleteAll();
+    }
 
     @Test
     void getBookDetailReturnsBookWithGbrPrice() {
