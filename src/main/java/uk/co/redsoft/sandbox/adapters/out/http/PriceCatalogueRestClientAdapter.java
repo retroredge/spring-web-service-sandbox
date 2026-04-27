@@ -35,6 +35,7 @@ public class PriceCatalogueRestClientAdapter implements PriceCataloguePort {
                     .body(PriceCatalogueResponse.class);
         } catch (BookPricesNotFoundException e) {
             meterRegistry.counter("books.pricing.catalogue.error", "type", "not_found").increment();
+            meterRegistry.counter("books.pricing.lookup.outcome", "result", "empty").increment();
             return List.of();
         } catch (PriceCatalogueException e) {
             meterRegistry.counter("books.pricing.catalogue.error", "type", "server_error").increment();
@@ -42,13 +43,18 @@ public class PriceCatalogueRestClientAdapter implements PriceCataloguePort {
         }
 
         if (response == null || response.prices() == null) {
+            meterRegistry.counter("books.pricing.lookup.outcome", "result", "empty").increment();
             return List.of();
         }
 
-        return response.prices().stream()
+        var prices = response.prices().stream()
                 .filter(this::isValid)
                 .map(r -> new BookPrice(isbn, r.countryCode(), r.price()))
                 .toList();
+        if (prices.isEmpty()) {
+            meterRegistry.counter("books.pricing.lookup.outcome", "result", "empty").increment();
+        }
+        return prices;
     }
 
     private boolean isValid(BookPriceResponse item) {

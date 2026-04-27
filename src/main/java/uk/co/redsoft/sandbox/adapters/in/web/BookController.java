@@ -20,8 +20,9 @@ import org.springframework.web.multipart.MultipartFile;
 import uk.co.redsoft.sandbox.domain.model.Book;
 import uk.co.redsoft.sandbox.domain.model.BookDetail;
 import uk.co.redsoft.sandbox.domain.model.CreateBookCommand;
+import uk.co.redsoft.sandbox.domain.ports.in.BookWriteUseCase;
 import uk.co.redsoft.sandbox.domain.ports.in.BookDetailUseCase;
-import uk.co.redsoft.sandbox.domain.ports.in.BookUseCase;
+import uk.co.redsoft.sandbox.domain.ports.in.BookQueryUseCase;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -34,13 +35,14 @@ import java.util.List;
 @RequestMapping("/books")
 public class BookController {
 
-    private final BookUseCase bookUseCase;
+    private final BookQueryUseCase bookQueryUseCase;
+    private final BookWriteUseCase bookWriteUseCase;
     private final BookDetailUseCase bookDetailUseCase;
     private final Validator validator;
 
     @GetMapping
     public List<Book> getAllBooks() {
-        return bookUseCase.findAll();
+        return bookQueryUseCase.findAll();
     }
 
     @GetMapping("/{id}")
@@ -52,7 +54,7 @@ public class BookController {
 
     @PostMapping
     public ResponseEntity<Book> createBook(@Valid @RequestBody CreateBookRequest request) {
-        var book = bookUseCase.create(new CreateBookCommand(request.title(), request.author(), request.isbn(), request.genre()));
+        var book = bookWriteUseCase.create(new CreateBookCommand(request.title(), request.author(), request.isbn(), request.genre()));
         return ResponseEntity.created(URI.create("/books/" + book.id())).body(book);
     }
 
@@ -74,7 +76,7 @@ public class BookController {
                             violations.stream().map(v -> v.getPropertyPath() + " " + v.getMessage()).toList());
                     continue;
                 }
-                bookUseCase.importBook(new CreateBookCommand(request.title(), request.author(), request.isbn(), request.genre()));
+                bookWriteUseCase.importBook(new CreateBookCommand(request.title(), request.author(), request.isbn(), request.genre()));
             }
         }
     }

@@ -1,7 +1,6 @@
 package uk.co.redsoft.sandbox.domain.usecase;
 
 import io.micrometer.core.annotation.Timed;
-import io.micrometer.core.instrument.MeterRegistry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -17,7 +16,6 @@ public class PriceLookupService implements PriceLookupUseCase {
 
     private final PriceCataloguePort priceCataloguePort;
     private final PriceRepositoryPort priceStore;
-    private final MeterRegistry meterRegistry;
 
     @Timed("books.pricing.lookup")
     @Transactional
@@ -27,12 +25,10 @@ public class PriceLookupService implements PriceLookupUseCase {
         var prices = priceCataloguePort.fetchPrices(isbn);
         if (prices.isEmpty()) {
             log.warn("No prices returned for ISBN: {}, skipping update", isbn);
-            meterRegistry.counter("books.pricing.lookup.outcome", "result", "empty").increment();
             return;
         }
         priceStore.deleteByIsbn(isbn);
         priceStore.saveAll(prices);
         log.debug("Stored {} price(s) for ISBN: {}", prices.size(), isbn);
-        meterRegistry.counter("books.pricing.lookup.outcome", "result", "success").increment();
     }
 }

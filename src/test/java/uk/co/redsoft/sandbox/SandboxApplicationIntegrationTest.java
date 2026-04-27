@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import uk.co.redsoft.sandbox.adapters.out.persistence.JpaBookPriceRepository;
 import uk.co.redsoft.sandbox.domain.model.CreateBookCommand;
-import uk.co.redsoft.sandbox.domain.ports.in.BookUseCase;
+import uk.co.redsoft.sandbox.domain.ports.in.BookWriteUseCase;
 
 import java.util.concurrent.TimeUnit;
 
@@ -16,14 +16,14 @@ import static org.awaitility.Awaitility.await;
 class SandboxApplicationIntegrationTest extends AbstractWireMockContainersIntegrationTest {
 
     @Autowired
-    private BookUseCase bookUseCase;
+    private BookWriteUseCase bookWriteUseCase;
 
     @Autowired
     private JpaBookPriceRepository jpaBookPriceRepository;
 
     @Test
     void createBookTriggersAsyncPricingAndStoresPrices() {
-        bookUseCase.create(new CreateBookCommand(
+        bookWriteUseCase.create(new CreateBookCommand(
                 "Clean Code", "Robert C. Martin", "978-0132350884", "Software Engineering"));
 
         await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {

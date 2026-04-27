@@ -1,11 +1,9 @@
 package uk.co.redsoft.sandbox.domain.usecase;
 
-import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.redsoft.sandbox.domain.model.BookPrice;
 import uk.co.redsoft.sandbox.domain.ports.out.PriceCataloguePort;
@@ -28,9 +26,6 @@ class PriceLookupServiceTest {
 
     @Mock
     private PriceRepositoryPort priceStore;
-
-    @Spy
-    private SimpleMeterRegistry meterRegistry = new SimpleMeterRegistry();
 
     @InjectMocks
     private PriceLookupService priceLookupService;

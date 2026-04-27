@@ -10,8 +10,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import uk.co.redsoft.sandbox.domain.model.Book;
 import uk.co.redsoft.sandbox.domain.model.BookDetail;
 import uk.co.redsoft.sandbox.domain.model.CreateBookCommand;
+import uk.co.redsoft.sandbox.domain.ports.in.BookWriteUseCase;
 import uk.co.redsoft.sandbox.domain.ports.in.BookDetailUseCase;
-import uk.co.redsoft.sandbox.domain.ports.in.BookUseCase;
+import uk.co.redsoft.sandbox.domain.ports.in.BookQueryUseCase;
 
 import java.util.List;
 import java.util.Optional;
@@ -34,14 +35,17 @@ class BookControllerTest {
     private MockMvc mockMvc;
 
     @MockitoBean
-    private BookUseCase bookUseCase;
+    private BookQueryUseCase bookQueryUseCase;
+
+    @MockitoBean
+    private BookWriteUseCase bookWriteUseCase;
 
     @MockitoBean
     private BookDetailUseCase bookDetailUseCase;
 
     @Test
     void getAllBooksReturns200WithAllBooks() throws Exception {
-        when(bookUseCase.findAll()).thenReturn(List.of(
+        when(bookQueryUseCase.findAll()).thenReturn(List.of(
                 new Book(1L, "The Pragmatic Programmer", "David Thomas & Andrew Hunt", "978-0135957059", "Software Engineering"),
                 new Book(2L, "Clean Code", "Robert C. Martin", "978-0132350884", "Software Engineering")
         ));
@@ -129,12 +133,12 @@ class BookControllerTest {
         mockMvc.perform(multipart("/books/import").file(file))
                 .andExpect(status().isAccepted());
 
-        verify(bookUseCase, times(1)).importBook(any(CreateBookCommand.class));
+        verify(bookWriteUseCase, times(1)).importBook(any(CreateBookCommand.class));
     }
 
     @Test
     void createBookReturns201WithLocationAndBody() throws Exception {
-        when(bookUseCase.create(any(CreateBookCommand.class))).thenReturn(
+        when(bookWriteUseCase.create(any(CreateBookCommand.class))).thenReturn(
                 new Book(1L, "Clean Code", "Robert C. Martin", "978-0132350884", "Software Engineering")
         );
 

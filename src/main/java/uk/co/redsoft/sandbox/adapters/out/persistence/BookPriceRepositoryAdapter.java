@@ -28,6 +28,7 @@ public class BookPriceRepositoryAdapter implements PriceRepositoryPort {
         DistributionSummary.builder("books.pricing.prices.per.book")
                 .register(meterRegistry)
                 .record(prices.size());
+        meterRegistry.counter("books.pricing.lookup.outcome", "result", "success").increment();
     }
 
     @Override

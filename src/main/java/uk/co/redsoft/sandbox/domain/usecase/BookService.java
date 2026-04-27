@@ -5,7 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.co.redsoft.sandbox.domain.model.Book;
 import uk.co.redsoft.sandbox.domain.model.CreateBookCommand;
-import uk.co.redsoft.sandbox.domain.ports.in.BookUseCase;
+import uk.co.redsoft.sandbox.domain.ports.in.BookWriteUseCase;
+import uk.co.redsoft.sandbox.domain.ports.in.BookQueryUseCase;
 import uk.co.redsoft.sandbox.domain.ports.out.BookImportPort;
 import uk.co.redsoft.sandbox.domain.ports.out.BookPricingPublishPort;
 import uk.co.redsoft.sandbox.domain.ports.out.BookRepositoryPort;
@@ -16,7 +17,7 @@ import java.util.Optional;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class BookService implements BookUseCase {
+public class BookService implements BookQueryUseCase, BookWriteUseCase {
 
     private final BookRepositoryPort bookStore;
     private final BookImportPort bookImportPort;

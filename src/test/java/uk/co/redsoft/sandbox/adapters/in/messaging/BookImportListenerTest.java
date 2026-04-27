@@ -7,7 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.redsoft.sandbox.domain.model.CreateBookCommand;
-import uk.co.redsoft.sandbox.domain.ports.in.BookUseCase;
+import uk.co.redsoft.sandbox.domain.ports.in.BookWriteUseCase;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
@@ -16,7 +16,7 @@ import static org.mockito.Mockito.verify;
 class BookImportListenerTest {
 
     @Mock
-    private BookUseCase bookUseCase;
+    private BookWriteUseCase bookWriteUseCase;
 
     @InjectMocks
     private BookImportListener bookImportListener;
@@ -28,7 +28,7 @@ class BookImportListenerTest {
         bookImportListener.onMessage(command);
 
         var captor = ArgumentCaptor.forClass(CreateBookCommand.class);
-        verify(bookUseCase).create(captor.capture());
+        verify(bookWriteUseCase).create(captor.capture());
         assertThat(captor.getValue().title()).isEqualTo("Clean Code");
         assertThat(captor.getValue().isbn()).isEqualTo("978-0132350884");
     }
