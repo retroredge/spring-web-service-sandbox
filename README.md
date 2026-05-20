@@ -284,6 +284,7 @@ curl -X POST http://localhost:8080/books/import -F "file=@src/test/resources/boo
 | `http://localhost:8080/actuator/beans` | All Spring beans in the application context |
 | `http://localhost:8080/actuator/prometheus` | Prometheus metrics scrape endpoint |
 | `http://localhost:8080/actuator/book-pricing-listener` | Read or toggle the book pricing listener feature flag |
+| `http://localhost:8080/actuator/price-catalogue-stub` | Read or toggle the price catalogue stub feature flag |
 
 ## Book pricing
 
@@ -363,6 +364,58 @@ While the listener is disabled you can observe messages accumulating in the Rabb
 messaging:
   pricing-listener:
     enabled: true   # set to false to start with the listener paused
+```
+
+### Price catalogue stub feature flag
+
+In environments where the real price catalogue API is not reachable and WireMock cannot be deployed, a built-in stub 
+can be hot-swapped in at runtime — no restart required.
+
+**How it works:**
+
+The `RestClient` used by `PriceCatalogueRestClientAdapter` is backed by a `ToggleableClientHttpRequestFactory`. On every 
+outbound request it checks an `AtomicBoolean` flag and routes to either:
+- the real `ClientHttpRequestFactory` (backed by Apache HttpClient) — the default, or
+- `StubPriceCatalogueClientHttpRequestFactory` — an in-process stub that inspects the ISBN in the request URI and returns:
+  - **200** with a canned JSON price list for ISBN `978-0132350884`
+  - **404** for any other ISBN
+
+The `PriceCatalogueRestClientAdapter` is unaware of the substitution — it operates identically against either factory.
+
+The flag is controlled via the `/actuator/price-catalogue-stub` endpoint. Changes take effect immediately for all 
+subsequent requests without touching any Spring beans.
+
+**Check current state:**
+
+```bash
+curl http://localhost:8080/actuator/price-catalogue-stub
+# {"stubEnabled":false}
+```
+
+**Enable the stub (switch away from the real API):**
+
+```bash
+curl -X POST http://localhost:8080/actuator/price-catalogue-stub \
+     -H "Content-Type: application/json" \
+     -d '{"stubEnabled": true}'
+# 204 No Content
+```
+
+**Disable the stub (switch back to the real API):**
+
+```bash
+curl -X POST http://localhost:8080/actuator/price-catalogue-stub \
+     -H "Content-Type: application/json" \
+     -d '{"stubEnabled": false}'
+# 204 No Content
+```
+
+**Configure the startup default** in `application.yaml`:
+
+```yaml
+pricing:
+  catalogue:
+    stub-enabled: false   # set to true to start with the stub active
 ```
 
 ---

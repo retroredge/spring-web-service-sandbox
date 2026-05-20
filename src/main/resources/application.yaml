@@ -18,7 +18,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,metrics,info,env,loggers,mappings,scheduledtasks,httpexchanges,beans,prometheus,book-pricing-listener
+        include: health,metrics,info,env,loggers,mappings,scheduledtasks,httpexchanges,beans,prometheus,book-pricing-listener,price-catalogue-stub
   info:
     env:
       enabled: true
@@ -33,6 +33,7 @@ pricing:
     username: catalogue-user
     password: secret
     skip-ssl: false
+    stub-enabled: false
 
 info:
   app:
