@@ -11,6 +11,7 @@ public class RabbitConfig {
 
     public static final String QUEUE = "books.import";
     public static final String PRICING_QUEUE = "books.pricing";
+    public static final String PRICING_DLQ = "books.pricing.dlq";
 
     @Bean
     Queue queue() {
@@ -20,6 +21,11 @@ public class RabbitConfig {
     @Bean
     Queue pricingQueue() {
         return new Queue(PRICING_QUEUE);
+    }
+
+    @Bean
+    Queue pricingDlq() {
+        return new Queue(PRICING_DLQ);
     }
 
     @Bean
