@@ -8,14 +8,16 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import uk.co.redsoft.sandbox.adapters.out.messaging.RabbitBookPricingPublishAdapter;
 import uk.co.redsoft.sandbox.config.RabbitConfig;
 
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
 @SpringBootTest
 class BookPricingRetryIntegrationTest extends AbstractWireMockContainersIntegrationTest {
+
+    private static final long RECEIVE_TIMEOUT_MS = 1_000;
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
@@ -27,17 +29,13 @@ class BookPricingRetryIntegrationTest extends AbstractWireMockContainersIntegrat
     void whenPriceCatalogueReturns5xx_messageIsDeadLettered() {
         bookPricingPublishAdapter.publish("978-0000000000");
 
-        var dlqMessage = new AtomicReference<Message>();
-        await().atMost(30, TimeUnit.SECONDS).untilAsserted(() -> {
-            var msg = rabbitTemplate.receive(RabbitConfig.PRICING_DLQ, 1000);
-            assertThat(msg).isNotNull();
-            dlqMessage.set(msg);
-        });
+        var dlqMessage = await().atMost(30, TimeUnit.SECONDS)
+                .until(() -> rabbitTemplate.receive(RabbitConfig.PRICING_DLQ, RECEIVE_TIMEOUT_MS), Objects::nonNull);
 
-        assertThat(dlqMessage.get().getMessageProperties().getHeaders())
+        assertThat(dlqMessage.getMessageProperties().getHeaders())
                 .containsKey("x-exception-message");
 
-        var residual = rabbitTemplate.receive(RabbitConfig.PRICING_QUEUE, 1000);
+        var residual = rabbitTemplate.receive(RabbitConfig.PRICING_QUEUE, RECEIVE_TIMEOUT_MS);
         assertThat(residual).isNull();
     }
 }
