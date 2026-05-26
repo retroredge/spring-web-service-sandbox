@@ -1,0 +1,14 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/catalogue/books/978-0000000000/prices",
+    "basicAuthCredentials": {
+      "username": "catalogue-user",
+      "password": "secret"
+    }
+  },
+  "response": {
+    "status": 500,
+    "body": "Internal Server Error"
+  }
+}
