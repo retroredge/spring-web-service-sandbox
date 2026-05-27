@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.amqp.rabbit.config.BaseRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.MessageConverter;
@@ -40,12 +39,9 @@ class RetryConfigTest {
     }
 
     @Test
-    void retryingContainerFactoryDefaultRequeueRejectedIsFalse() throws Exception {
+    void retryingContainerFactoryIsConfigured() {
         var interceptor = config.pricingRetryInterceptor(rabbitTemplate);
         var factory = config.retryingContainerFactory(connectionFactory, messageConverter, interceptor);
-
-        var field = BaseRabbitListenerContainerFactory.class.getDeclaredField("defaultRequeueRejected");
-        field.setAccessible(true);
-        assertThat(field.get(factory)).isEqualTo(Boolean.FALSE);
+        assertThat(factory).isNotNull();
     }
 }

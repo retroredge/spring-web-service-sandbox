@@ -38,7 +38,6 @@ public class RetryConfig {
         factory.setConnectionFactory(connectionFactory);
         factory.setMessageConverter(messageConverter);
         factory.setAdviceChain(pricingRetryInterceptor);
-        factory.setDefaultRequeueRejected(false);
         return factory;
     }
 }
