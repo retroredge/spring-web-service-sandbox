@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.amqp.rabbit.config.BaseRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.MessageConverter;
@@ -23,15 +24,28 @@ class RetryConfigTest {
     @Test
     void pricingRetryInterceptorIsStateful() {
         var interceptor = config.pricingRetryInterceptor(rabbitTemplate);
-
         assertThat(interceptor).isInstanceOf(StatefulRetryOperationsInterceptor.class);
     }
 
     @Test
-    void retryingContainerFactoryIsConfigured() {
+    void pricingRetryInterceptorMaxAttempts() {
+        assertThat(RetryConfig.MAX_ATTEMPTS).isEqualTo(4);
+    }
+
+    @Test
+    void pricingRetryInterceptorBackoffParams() {
+        assertThat(RetryConfig.INITIAL_BACKOFF_MS).isEqualTo(2_000L);
+        assertThat(RetryConfig.BACKOFF_MULTIPLIER).isEqualTo(2.0);
+        assertThat(RetryConfig.MAX_BACKOFF_MS).isEqualTo(8_000L);
+    }
+
+    @Test
+    void retryingContainerFactoryDefaultRequeueRejectedIsFalse() throws Exception {
         var interceptor = config.pricingRetryInterceptor(rabbitTemplate);
         var factory = config.retryingContainerFactory(connectionFactory, messageConverter, interceptor);
 
-        assertThat(factory).isNotNull();
+        var field = BaseRabbitListenerContainerFactory.class.getDeclaredField("defaultRequeueRejected");
+        field.setAccessible(true);
+        assertThat(field.get(factory)).isEqualTo(Boolean.FALSE);
     }
 }
