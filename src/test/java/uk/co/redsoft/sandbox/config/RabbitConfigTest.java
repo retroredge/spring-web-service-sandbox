@@ -31,7 +31,7 @@ class RabbitConfigTest {
     void messageIdCustomizerSetsUuidMessageId() {
         var processors = new ArrayList<MessagePostProcessor>();
         doAnswer(inv -> { processors.add(inv.getArgument(0)); return null; })
-            .when(rabbitTemplate).setBeforePublishPostProcessors(any(MessagePostProcessor.class));
+            .when(rabbitTemplate).addBeforePublishPostProcessors(any(MessagePostProcessor.class));
 
         config.messageIdCustomizer().customize(rabbitTemplate);
 

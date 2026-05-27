@@ -1,7 +1,6 @@
 package uk.co.redsoft.sandbox;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.amqp.core.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;

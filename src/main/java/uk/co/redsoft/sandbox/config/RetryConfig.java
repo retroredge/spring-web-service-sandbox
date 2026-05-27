@@ -13,10 +13,10 @@ import org.springframework.retry.interceptor.StatefulRetryOperationsInterceptor;
 @Configuration
 public class RetryConfig {
 
-    static final int MAX_ATTEMPTS = 4;
-    static final long INITIAL_BACKOFF_MS = 2_000;
-    static final double BACKOFF_MULTIPLIER = 2.0;
-    static final long MAX_BACKOFF_MS = 8_000;
+    public static final int MAX_ATTEMPTS = 4;
+    public static final long INITIAL_BACKOFF_MS = 2_000;
+    public static final double BACKOFF_MULTIPLIER = 2.0;
+    public static final long MAX_BACKOFF_MS = 8_000;
 
     @Bean
     StatefulRetryOperationsInterceptor pricingRetryInterceptor(RabbitTemplate rabbitTemplate) {

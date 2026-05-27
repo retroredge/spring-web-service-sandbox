@@ -39,7 +39,7 @@ public class RabbitConfig {
 
     @Bean
     RabbitTemplateCustomizer messageIdCustomizer() {
-        return template -> template.setBeforePublishPostProcessors(msg -> {
+        return template -> template.addBeforePublishPostProcessors(msg -> {
             msg.getMessageProperties().setMessageId(UUID.randomUUID().toString());
             return msg;
         });
