@@ -60,6 +60,7 @@ public class RetryConfig {
                 .maxAttempts(4)                          // 1 initial + 3 retries
                 // initialInterval=2s, multiplier=2.0, maxInterval=8s → waits of 2s, 4s, 8s
                 .backOffOptions(2000, 2.0, 8000)
+                // routes via the default exchange — empty string means default exchange, queue name is the routing key
                 .recoverer(new RepublishMessageRecoverer(rabbitTemplate, "", RabbitConfig.PRICING_DLQ))
                 .build();
     }
